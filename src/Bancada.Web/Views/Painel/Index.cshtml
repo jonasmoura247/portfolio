@@ -1,0 +1,132 @@
+@model PainelVm
+@using System.Text.Json
+@{
+    JsonElement? ins = Model.Instantaneo;
+    string Nome(string a) => "painel.aba." + a;
+}
+<div class="linha-flex entre">
+  <div><p class="dev">@T["menu.painel"]</p><h1>@T["painel.titulo"]</h1></div>
+  @if (ins is { } m)
+  {
+    <span class="selo s-neutro">@T["painel.medidoEm"] @m.GetProperty("gerado_em").GetString()</span>
+  }
+</div>
+<div class="abas" role="tablist">
+  @foreach (var a in PainelController.Abas)
+  {
+    <a class="aba" role="tab" href="/painel?aba=@a" aria-selected="@(a == Model.Aba ? "true" : "false")">@T[Nome(a)]</a>
+  }
+</div>
+<div class="pilha">
+  @switch (Model.Aba)
+  {
+    case "testes":
+    {
+      <div class="painel" id="executor" data-executor="/painel/testes/estado" data-executor-inicial="@Model.Executor.Estado">
+        <div class="cab"><h3>@T["painel.rodar"]</h3>
+          <form class="linha-flex" method="post" action="/painel/testes/executar" asp-antiforgery="true">
+            <button class="btn primario" name="suite" value="js" type="submit" disabled="@(!Model.ExecutorLigado)">@T["painel.rodarJs"]</button>
+            <button class="btn" name="suite" value="csharp" type="submit" disabled="@(!Model.ExecutorLigado)">@T["painel.rodarCs"]</button>
+          </form>
+        </div>
+        <div class="corpo pilha">
+          @if (!Model.ExecutorLigado)
+          {
+            <div class="alerta info"><span aria-hidden="true">ⓘ</span><div>@T["painel.erro.desligado"]</div></div>
+          }
+          <p class="mut pequeno">@T["painel.limites"]</p>
+          <p class="mono" data-executor-estado>@T["executor." + Model.Executor.Estado]</p>
+          <div class="console" aria-live="polite" tabindex="0" data-executor-saida>@Model.Executor.Saida</div>
+        </div>
+      </div>
+      break;
+    }
+    case "arquitetura":
+    {
+      <figure class="fig sem-margem"><div class="figt"><h3>@T["painel.dependencias"]</h3><span>@T["painel.dependenciasNota"]</span></div>
+        @Graficos.Dependencias(Model.Camadas, T["painel.dependencias"])</figure>
+      break;
+    }
+    case "banco":
+    {
+      <section class="painel"><div class="cab"><h3>@T["painel.banco"]</h3><span class="mut pequeno">@Model.Banco.Count · sqlite_master</span></div>
+        <div class="corpo pilha">
+          @foreach (var g in Model.Banco.GroupBy(o => o.Tipo))
+          {
+            <div class="rotulo">@g.Key</div>
+            <div class="chips">
+              @foreach (var o in g)
+              {
+                <span class="chip @(g.Key == "trigger" ? "v" : g.Key == "index" ? "t" : "a")">@o.Nome</span>
+              }
+            </div>
+          }
+        </div>
+      </section>
+      break;
+    }
+    case "seguranca":
+    {
+      <section class="painel"><div class="cab"><h3>@T["painel.cabecalhos"]</h3></div>
+        <div class="corpo"><div class="codigo">@string.Join("\n", CabecalhosDeSeguranca.Padrao.Select(h => $"{h.Nome}: {Context.Response.Headers[h.Nome]}"))</div></div></section>
+      break;
+    }
+    case "codigo":
+    {
+      <div class="linha-flex">
+        @foreach (var a in CodigoPermitido.Arquivos)
+        {
+          <a class="chip @(a == Model.Arquivo ? "a" : null)" href="/painel?aba=codigo&arquivo=@a">@a</a>
+        }
+      </div>
+      <div class="codigo" tabindex="0">@Model.Codigo</div>
+      break;
+    }
+    default:
+    {
+      if (ins is not { } d)
+      {
+        <div class="alerta info"><span aria-hidden="true">ⓘ</span><div>@T["painel.semInstantaneo"]</div></div>
+      }
+      else if (Model.Aba == "licencas")
+      {
+        <section class="painel"><div class="cab"><h3>@T["painel.aba.licencas"]</h3><span class="mut pequeno">@T["painel.licencasNota"]</span></div><div class="rolagem"><table><tbody>
+          @foreach (var l in d.GetProperty("licencas").EnumerateArray())
+          {
+            <tr><td class="mono">@l.GetProperty("pacote").GetString()</td><td class="mono">@l.GetProperty("versao").GetString()</td><td>@l.GetProperty("licenca").GetString()</td></tr>
+          }
+        </tbody></table></div></section>
+      }
+      else if (Model.Aba == "catalogo")
+      {
+        <section class="painel"><div class="cab"><h3>@T["painel.aba.catalogo"]</h3></div><div class="rolagem"><table><tbody>
+          @foreach (var r in d.GetProperty("regras").EnumerateArray())
+          {
+            <tr><td class="mono">@r.GetProperty("rn").GetString()</td><td class="mono">@r.GetProperty("teste").GetString()</td></tr>
+          }
+        </tbody></table></div></section>
+      }
+      else
+      {
+        var cs = d.GetProperty("csharp");
+        var js = d.GetProperty("javascript");
+        var cobertura = cs.GetProperty("cobertura").EnumerateArray().ToList();
+        <div class="numeros">
+          <div class="numero"><span class="rotulo">@T["painel.testesCs"]</span><b>@cs.GetProperty("testes").GetInt32()</b><span class="selo s-ok">@cs.GetProperty("falhas").GetInt32() @T["painel.falhas"]</span></div>
+          <div class="numero"><span class="rotulo">@T["painel.testesJs"]</span><b>@js.GetProperty("testes").GetInt32()</b><span class="selo s-ok">@js.GetProperty("falhas").GetInt32() @T["painel.falhas"]</span></div>
+          <div class="numero"><span class="rotulo">@T["painel.cobertura"]</span><b>@d.GetProperty("cobertura_minima").GetDouble()%</b><span class="mut pequeno">@T["painel.coberturaNota"]</span></div>
+          <div class="numero"><span class="rotulo">@T["painel.regras"]</span><b>@d.GetProperty("regras").EnumerateArray().Select(r => r.GetProperty("rn").GetString()).Distinct().Count()</b></div>
+        </div>
+        <section class="painel"><div class="cab"><h3>@T["painel.coberturaPorProjeto"]</h3></div><div class="corpo cobertura">
+          @foreach (var c in cobertura)
+          {
+            <div class="cob"><span class="mono">@c.GetProperty("nome").GetString()</span><progress max="100" value="@c.GetProperty("linhas").GetDouble()"></progress><span class="pc">@c.GetProperty("linhas").GetDouble()%</span></div>
+          }
+        </div></section>
+        <figure class="fig sem-margem"><div class="figt"><h3>@T["painel.testesPorProjeto"]</h3></div>
+          @Graficos.Rosca(cs.GetProperty("projetos").EnumerateArray().Select((p, i) => new Dado(p.GetProperty("nome").GetString()!, p.GetProperty("testes").GetInt32(), new[] { "a", "t", "v", "ok", "at", "pe" }[i % 6])).ToList(), cs.GetProperty("testes").GetInt32().ToString(), T["painel.testesCs"], T["painel.testesPorProjeto"])</figure>
+      }
+      break;
+    }
+  }
+</div>

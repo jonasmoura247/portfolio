@@ -1,0 +1,39 @@
+@model AuditoriaVm
+<partial name="_Titulo" model='("menu.auditoria", "auditoria.titulo", (string?)"auditoria.sub")' />
+@if (Model.Verificacao is { } v)
+{
+  if (v.QuebraEm is null)
+  {
+    <div class="alerta ok" role="status"><span aria-hidden="true">✓</span><div>@T["auditoria.integra"] (@v.Total)</div></div>
+  }
+  else
+  {
+    <div class="alerta critico" role="status"><span aria-hidden="true">!</span><div>@T["auditoria.quebrou"] @v.QuebraEm. @T["auditoria.simulada"]</div></div>
+  }
+}
+<div class="linha-flex">
+  <form method="post" action="/auditoria/verificar" asp-antiforgery="true"><button class="btn primario" type="submit">@T["auditoria.verificar"]</button></form>
+  <form method="post" action="/auditoria/simular" asp-antiforgery="true"><button class="btn perigo" type="submit">@T["auditoria.simular"]</button></form>
+  <a class="btn peq" href="/auditoria">@T["auditoria.todos"]</a>
+  @foreach (var g in ConsultaDeAuditoria.Grupos.Keys)
+  {
+    <a class="btn peq" href="/auditoria?grupo=@g">@T["auditoria.grupo." + g]</a>
+  }
+</div>
+<p class="mut pequeno">@T["auditoria.limite"]</p>
+<section class="painel"><div class="rolagem"><table>
+  <thead><tr><th>#</th><th>@T["auditoria.acao"]</th><th>@T["topo.operador"]</th><th>@T["auditoria.alvo"]</th><th>@T["comum.estado"]</th><th>@T["auditoria.hash"]</th></tr></thead>
+  <tbody>
+    @foreach (var e in Model.Eventos)
+    {
+      <tr><td class="num-t">@e.Seq</td><td class="mono">@e.Acao</td><td class="mono">@e.Operador</td><td class="mono">@e.AlvoTipo @e.AlvoId</td><td><span class="selo @Apresentacao.Selo(e.Resultado)">@T["estado." + e.Resultado]</span></td><td class="hash">@e.Hash[..12]…</td></tr>
+    }
+  </tbody>
+</table></div></section>
+<div class="linha-flex">
+  <span class="mut">@T["comum.pagina"] @Model.Pagina / @Model.Paginas</span>
+  @if (Model.Pagina < Model.Paginas)
+  {
+    <a class="btn peq" href="/auditoria?grupo=@Model.Grupo&pagina=@(Model.Pagina + 1)">@T["comum.proxima"]</a>
+  }
+</div>

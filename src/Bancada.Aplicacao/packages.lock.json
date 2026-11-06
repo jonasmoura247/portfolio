@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net9.0": {
+      "bancada.dominio": {
+        "type": "Project"
+      },
+      "bancada.protocolos": {
+        "type": "Project"
+      }
+    }
+  }
+}

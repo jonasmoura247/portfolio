@@ -1,0 +1,37 @@
+@model VisaoDoLaudo
+@{ var l = Model.Laudo; }
+<partial name="_Titulo" model='("menu.resultados", "laudo.titulo", (string?)null)' />
+<article class="laudo">
+  <h3>@T["laudo.titulo"] · @Model.Pedido.Codigo · v@(l.Versao)</h3>
+  <p>@Model.Paciente.Nome (@Model.Paciente.Codigo) · @T["sexo." + Model.Paciente.Sexo] · @Model.Idade @T["comum.anos"]</p>
+  <p>@T["laudo.liberado"] @l.LiberadoEm.ToString("dd/MM/yyyy HH:mm") · @l.LiberadoPorId</p>
+  @if (Model.Motivo is not null)
+  {
+    <p><b>@T["laudo.motivo"]:</b> @Model.Motivo</p>
+  }
+  <table>
+    <thead><tr><th>@T["resultado.analito"]</th><th class="num-t">@T["resultado.valor"]</th><th>@T["laudo.faixa"]</th><th>@T["resultado.flag"]</th></tr></thead>
+    <tbody>
+      @foreach (var i in Model.Itens)
+      {
+        <tr><td class="mono">@i.Analito</td><td class="num-t">@Apresentacao.Valor(i.Valor, i.Casas) @i.Unidade</td><td>@Apresentacao.Faixa(i.NormalMin, i.NormalMax, i.Casas)</td><td><span class="flag @Apresentacao.Flag(i.Flag)">@Apresentacao.Rotulo(i.Flag)</span></td></tr>
+      }
+    </tbody>
+  </table>
+  <p class="rodape">@T["aviso.ficticio"]</p>
+</article>
+<div class="linha-flex">
+  <a class="btn" href="/resultados">@T["comum.voltar"]</a>
+  <button class="btn" type="button" data-imprimir>@T["coleta.imprimir"]</button>
+  @foreach (var v in Model.Versoes.Where(v => v != l.Id))
+  {
+    <a class="chip" href="/laudos/@v">#@v</a>
+  }
+</div>
+@if (Context.Pode(Acao.RetificarLaudo))
+{
+  <form class="linha-flex" method="post" action="/laudos/@Model.Pedido.Id/retificar" asp-antiforgery="true">
+    <input class="campo" name="motivo" maxlength="200" required placeholder="@T["laudo.motivo"]" aria-label="@T["laudo.motivo"]">
+    <button class="btn" type="submit">@T["laudo.retificar"]</button>
+  </form>
+}

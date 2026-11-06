@@ -1,0 +1,37 @@
+@model PaginaDePacientes
+@{ var busca = (string?)ViewBag.Busca; }
+<partial name="_Titulo" model='("menu.pacientes", "pacientes.titulo", (string?)"pacientes.sub")' />
+<section class="painel">
+  <div class="cab"><h3>@T["pacientes.lista"]</h3>
+    <form method="get" action="/pacientes" class="linha-flex"><input class="campo" type="search" name="busca" maxlength="64" value="@busca" placeholder="@T["pacientes.buscar"]" aria-label="@T["pacientes.buscar"]"><button class="btn" type="submit">@T["comum.buscar"]</button></form>
+  </div>
+  @if (Model.Itens.Count == 0)
+  {
+    <p class="mut vazio">@T["pacientes.vazio"]</p>
+  }
+  else
+  {
+    <div class="rolagem"><table>
+      <thead><tr><th>@T["comum.codigo"]</th><th>@T["comum.nome"]</th><th class="num-t">@T["comum.idade"]</th><th>@T["comum.sexo"]</th><th></th></tr></thead>
+      <tbody>
+        @foreach (var p in Model.Itens)
+        {
+          <tr><td class="mono">@p.Codigo</td><td>@p.Nome</td><td class="num-t">@p.IdadeEm(Context.Sessao().Simulacao.Hoje)</td><td>@p.Sexo</td><td><a class="btn peq" href="/pacientes/@p.Id">@T["pacientes.abrir"]</a></td></tr>
+        }
+      </tbody>
+    </table></div>
+    <div class="corpo linha-flex entre">
+      <span class="mut">@T["comum.pagina"] @Model.Pagina / @Model.Paginas · @Model.Total</span>
+      <span class="linha-flex">
+        @if (Model.Pagina > 1)
+        {
+          <a class="btn peq" href="/pacientes?busca=@busca&pagina=@(Model.Pagina - 1)">@T["comum.anterior"]</a>
+        }
+        @if (Model.Pagina < Model.Paginas)
+        {
+          <a class="btn peq" href="/pacientes?busca=@busca&pagina=@(Model.Pagina + 1)">@T["comum.proxima"]</a>
+        }
+      </span>
+    </div>
+  }
+</section>

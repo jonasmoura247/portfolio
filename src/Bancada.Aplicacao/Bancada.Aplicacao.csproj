@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Bancada.Dominio\Bancada.Dominio.csproj" />
+    <ProjectReference Include="..\Bancada.Protocolos\Bancada.Protocolos.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Bancada.Testes.Aplicacao" />
+  </ItemGroup>
+</Project>

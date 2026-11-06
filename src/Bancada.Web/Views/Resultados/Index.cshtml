@@ -1,0 +1,65 @@
+@model ResultadosVm
+<partial name="_Titulo" model='("menu.resultados", "resultado.titulo", (string?)"resultado.sub")' />
+@if (Context.Pode(Acao.VerPendentes))
+{
+  @if (Model.Pendentes.Count == 0)
+  {
+    <section class="painel"><p class="mut vazio">@T["resultado.semPendentes"]</p></section>
+  }
+  @foreach (var g in Model.Pendentes)
+  {
+    <section class="painel destaque">
+      <div class="cab"><h3>@g.Pedido.Codigo <span class="mut">@g.Paciente.Codigo · @g.Paciente.Nome</span></h3></div>
+      <div class="rolagem"><table>
+        <thead><tr><th>@T["resultado.analito"]</th><th class="num-t">@T["resultado.valor"]</th><th>@T["resultado.flag"]</th><th class="num-t">@T["resultado.anterior"]</th><th>@T["comum.estado"]</th><th></th></tr></thead>
+        <tbody>
+          @foreach (var r in g.Resultados)
+          {
+            var a = Catalogo.AnalitoDe(r.Analito);
+            var mesmo = r.EnviadoPorId == Context.Sessao().Operador;
+            <tr>
+              <td class="mono">@r.Analito</td><td class="num-t">@Apresentacao.Valor(r.Valor, a.Casas) @a.Unidade</td>
+              <td><span class="flag @Apresentacao.Flag(r.Flag)">@Apresentacao.Rotulo(r.Flag)</span>
+                @if (r.DeltaSuspeito)
+                {
+                  <span class="selo s-atencao">@T["resultado.delta"]</span>
+                }
+              </td>
+              <td class="num-t">@(r.Anterior is double v ? Apresentacao.Valor(v, a.Casas) : "—")</td>
+              <td><span class="selo @Apresentacao.Selo(r.Estado)">@T["estado." + r.Estado]</span></td>
+              <td>
+                @if (r.Critico && r.Estado == EstadoResultado.Preliminar)
+                {
+                  <form method="post" action="/resultados/@r.Id/confirmar-critico" asp-antiforgery="true"><button class="btn peq perigo" type="submit">@T["resultado.confirmar"]</button></form>
+                }
+                else if (r.Estado != EstadoResultado.Validado)
+                {
+                  <form class="linha-flex" method="post" action="/resultados/@r.Id/validar" asp-antiforgery="true">
+                    @if (r.DeltaSuspeito)
+                    {
+                      <input class="campo" name="justificativa" maxlength="200" required placeholder="@T["resultado.justificativa"]" aria-label="@T["resultado.justificativa"]">
+                    }
+                    <button class="btn peq primario" type="submit" disabled="@mesmo" title="@(mesmo ? T["resultado.erro.mesmooperador"] : null)">@T["resultado.validar"]</button>
+                  </form>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table></div>
+      @if (g.Resultados.All(r => r.Estado == EstadoResultado.Validado))
+      {
+        <form class="corpo" method="post" action="/laudos/@g.Pedido.Id/liberar" asp-antiforgery="true"><button class="btn primario" type="submit">@T["resultado.liberar"]</button></form>
+      }
+    </section>
+  }
+}
+<section class="painel">
+  <div class="cab"><h3>@T["resultado.laudos"]</h3></div>
+  <div class="rolagem"><table><tbody>
+    @foreach (var l in Model.Laudos.Take(12))
+    {
+      <tr><td class="mono"><a href="/laudos/@l.Laudo.Id">@l.Pedido.Codigo v@(l.Laudo.Versao)</a></td><td>@l.Paciente.Codigo · @l.Paciente.Nome</td><td class="mono">@l.Laudo.LiberadoEm.ToString("dd/MM HH:mm")</td></tr>
+    }
+  </tbody></table></div>
+</section>

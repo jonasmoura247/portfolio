@@ -1,0 +1,23 @@
+@model VisaoDaOperacao
+@{
+    var total = Model.Livres + Model.Ocupadas + Model.Vencendo + Model.Vencidas;
+    var usadas = Model.Ocupadas + Model.Vencendo + Model.Vencidas;
+    var tempos = Model.Tempos.Select(t => new Dado(t.Exame, t.Minutos, "t")).ToList();
+    var filas = Model.Filas.Select(f => new Dado(f.Equipamento, f.Itens, "a")).ToList();
+    List<Dado> fatias = [new(T["operacao.livres"], Model.Livres, "n"), new(T["operacao.ocupadas"], Model.Ocupadas, "a"), new(T["soroteca.vencendo"], Model.Vencendo, "at"), new(T["soroteca.vencida"], Model.Vencidas, "pe")];
+}
+<partial name="_Titulo" model='("menu.operacao", "operacao.titulo", (string?)null)' />
+<div class="numeros">
+  <div class="numero"><span class="rotulo">@T["operacao.livres"]</span><b>@Model.Livres</b></div>
+  <div class="numero"><span class="rotulo">@T["operacao.ocupadas"]</span><b>@Model.Ocupadas</b></div>
+  <div class="numero"><span class="rotulo">@T["soroteca.vencendo"]</span><b>@Model.Vencendo</b></div>
+  <div class="numero"><span class="rotulo">@T["soroteca.vencida"]</span><b>@Model.Vencidas</b></div>
+</div>
+<div class="operacao">
+  <figure class="fig sem-margem"><div class="figt"><h3>@T["operacao.tempo"]</h3><span>@T["operacao.tempoNota"]</span></div>
+    @Graficos.Barras(tempos, "min", T["operacao.tempo"])</figure>
+  <figure class="fig sem-margem"><div class="figt"><h3>@T["operacao.soroteca"]</h3><span>@T["operacao.aoVivo"]</span></div>
+    @Graficos.Rosca(fatias, $"{100 * usadas / Math.Max(total, 1)}%", T["operacao.ocupada"], T["operacao.soroteca"])</figure>
+  <figure class="fig sem-margem"><div class="figt"><h3>@T["operacao.fila"]</h3><span>@T["operacao.aoVivo"]</span></div>
+    @Graficos.Barras(filas, "", T["operacao.fila"])</figure>
+</div>

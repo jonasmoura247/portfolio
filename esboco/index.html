@@ -1,0 +1,33 @@
+<meta charset="utf-8">
+<title>Esboço do Bancada</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="estilo.css">
+
+<div class="esboco"><div class="gut"><b>Esboço interativo.</b> Tudo roda no seu navegador com dados de exemplo e nada é salvo. O Bancada ainda não foi codificado; isto mostra como ele ficará pronto.</div></div>
+
+<header class="topo">
+  <div class="gut barra">
+    <span class="logo"><i aria-hidden="true"></i>BANCADA</span>
+    <div class="ctl">
+      <label>Papel <select class="sel" id="papel"></select></label>
+      <label>Operador <select class="sel" id="operador"></select></label>
+      <span class="sessao" id="sessao" title="Sessão: o id muda ao trocar de papel ou operador"></span>
+      <button class="btn" id="b-tema" type="button">Tema</button>
+      <button class="btn" id="b-idioma" type="button">PT · EN</button>
+      <button class="btn" id="b-reiniciar" type="button">Reiniciar sessão</button>
+    </div>
+  </div>
+</header>
+<div class="faixa"><div class="gut">Dados fictícios. Simulação educacional: não é dispositivo médico e não deve ser usada em decisão clínica.</div></div>
+
+<div class="app">
+  <nav class="menu" id="menu" aria-label="Módulos"></nav>
+  <main class="tela" id="tela" tabindex="-1"></main>
+</div>
+
+<div class="fundo-modal" id="fundo-modal" hidden>
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo"></div>
+</div>
+<div class="avisos" id="avisos" role="status" aria-live="polite"></div>
+
+<script type="module" src="app.js"></script>

@@ -1,0 +1,63 @@
+@model VisaoDosEquipamentos
+@{ var ativo = Model.Equipamentos.Any(e => e.Fila.Any(l => l.Execucao.Ativa)); }
+<div id="vivo" class="pilha" data-vivo="@(ativo ? "1500" : null)">
+  <div class="linha-flex entre">
+    <div><p class="dev">@T["menu.equipamento"]</p><h1>@T["equipamento.titulo"]</h1></div>
+    <form class="linha-flex" method="post" action="/equipamentos/relogio" asp-antiforgery="true">
+      <span class="mono">@Model.Relogio.ToString("dd/MM HH:mm:ss") · ×@Model.Fator</span>
+      <button class="btn peq" name="comando" value="pausar" type="submit" disabled="@Model.Pausado">@T["equipamento.pausar"]</button>
+      @foreach (var f in new[] { "1", "60", "600" })
+      {
+        <button class="btn peq" name="comando" value="@f" type="submit">×@f</button>
+      }
+    </form>
+  </div>
+  <div class="trio">
+    @foreach (var e in Model.Equipamentos)
+    {
+      <section class="painel">
+        <div class="cab"><h3 class="mono">@e.Equipamento.Codigo</h3><span class="chip">@e.Equipamento.Protocolo · @e.EmUso/@e.Equipamento.Capacidade</span></div>
+        <div class="corpo fila">
+          @if (e.Fila.Count == 0)
+          {
+            <p class="mut">@T["equipamento.livre"]</p>
+          }
+          @foreach (var l in e.Fila)
+          {
+            var x = l.Execucao;
+            <div class="item-fila">
+              <div class="linha-flex entre"><span class="mono">@x.Exame · @l.Amostra.Etiqueta</span><span class="selo @Apresentacao.Selo(x.Estado)">@T["estado." + x.Estado]</span></div>
+              <progress max="100" value="@((int)(x.Progresso * 100))" aria-label="@x.Exame"></progress>
+              @if (x.Estado == EstadoExecucao.Erro)
+              {
+                <form method="post" action="/execucoes/@x.Id/reprocessar" asp-antiforgery="true"><button class="btn peq" type="submit">@T["equipamento.reprocessar"]</button></form>
+              }
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+  <section class="painel">
+    <div class="cab"><h3>@T["equipamento.prontas"]</h3></div>
+    <div class="corpo linha-flex">
+      @if (Model.Prontas.Count == 0)
+      {
+        <p class="mut">@T["equipamento.semProntas"]</p>
+      }
+      @foreach (var a in Model.Prontas)
+      {
+        <form method="post" action="/equipamentos/@a.Id/enviar" asp-antiforgery="true"><button class="btn peq primario" type="submit">@T["equipamento.enviar"] @a.Etiqueta (@a.Exames)</button></form>
+      }
+    </div>
+  </section>
+  <section class="painel">
+    <div class="cab"><h3>@T["equipamento.monitor"]</h3><span class="mut pequeno">@T["equipamento.monitorNota"]</span></div>
+    <div class="corpo"><div class="prot" tabindex="0">
+      @foreach (var m in Model.Mensagens)
+      {
+        <div><span class="tm">@m.Quando.ToString("HH:mm:ss")</span> <span class="@(m.DoEquipamento ? "baixo" : "cima")">@(m.DoEquipamento ? "↓" : "↑")</span> <span class="tm">@m.Equipamento[3..6]</span> @Apresentacao.Protocolo(m.Texto)</div>
+      }
+    </div></div>
+  </section>
+</div>

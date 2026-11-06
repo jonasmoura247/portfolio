@@ -1,0 +1,133 @@
+@model AgendaVm
+@{
+    var s = Model.Semana;
+    var horas = s.Celulas.Select(c => TimeOnly.FromDateTime(c.Horario.Inicio)).Distinct().Order().ToList();
+    var dias = Enumerable.Range(0, 5).Select(s.Segunda.AddDays).ToList();
+    var porChave = s.Celulas.ToDictionary(c => c.Horario.Inicio);
+    var volta = $"profissional={s.Profissional}&semana={s.Deslocamento}";
+    var sel = Model.Selecionada;
+}
+<div class="linha-flex entre">
+  <div><p class="dev">@T["menu.agenda"]</p><h1>@T["agenda.titulo"] @s.Segunda.ToString("dd/MM")</h1></div>
+  <form method="get" action="/agenda" class="linha-flex">
+    <select class="sel" name="profissional" data-auto-enviar aria-label="@T["agenda.profissional"]">
+      @foreach (var o in Operadores.DoPapel(Papel.Medico))
+      {
+        <option value="@o.Id" selected="@(o.Id == s.Profissional)">@o.Nome (@o.Id)</option>
+      }
+    </select>
+    <input type="hidden" name="semana" value="@s.Deslocamento">
+  </form>
+  <span class="linha-flex">
+    <a class="btn peq" href="/agenda?profissional=@s.Profissional&semana=0">@T["agenda.estaSemana"]</a>
+    <a class="btn peq" href="/agenda?profissional=@s.Profissional&semana=1">@T["agenda.proximaSemana"]</a>
+  </span>
+</div>
+@if (!Context.Pode(Acao.Agendar))
+{
+  <div class="alerta info"><span aria-hidden="true">ⓘ</span><div>@T["agenda.soConsulta"]</div></div>
+}
+<div class="painel rolagem">
+  <table class="agenda">
+    <thead><tr><th></th>
+      @foreach (var d in dias)
+      {
+        <th>@T["dia." + d.DayOfWeek] @d.ToString("dd")</th>
+      }
+    </tr></thead>
+    <tbody>
+      @foreach (var h in horas)
+      {
+        <tr><td class="hora">@h.ToString("HH:mm")</td>
+          @foreach (var d in dias)
+          {
+            var c = porChave[d.ToDateTime(h)];
+            if (c.Agendamento is not null)
+            {
+              <td class="clicavel" data-href="/agenda?@volta&horario=@c.Horario.Id"><a class="marc" href="/agenda?@volta&horario=@c.Horario.Id"><b class="mono">@c.Paciente!.Codigo</b><span class="selo @Apresentacao.Selo(c.Agendamento.Estado)">@T["estado." + c.Agendamento.Estado]</span></a></td>
+            }
+            else if (c.Passado)
+            {
+              <td class="passado">—</td>
+            }
+            else if (Context.Pode(Acao.Agendar))
+            {
+              <td class="livre clicavel" data-href="/agenda?@volta&horario=@c.Horario.Id"><a href="/agenda?@volta&horario=@c.Horario.Id">@T["agenda.livre"]</a></td>
+            }
+            else
+            {
+              <td class="mut pequeno">@T["agenda.livre"]</td>
+            }
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+<p class="mut pequeno">@T["agenda.hoje"]</p>
+@if (sel is { Agendamento: null } && Context.Pode(Acao.Agendar))
+{
+  <dialog class="modal" data-modal data-volta="/agenda?@volta" aria-labelledby="modal-titulo">
+    <header><h2 id="modal-titulo">@T["agenda.novo"] <span class="mono mut">@sel.Horario.Inicio.ToString("dd/MM HH:mm")</span></h2><button class="btn peq" type="button" data-fechar aria-label="@T["comum.fechar"]">✕</button></header>
+    <form class="corpo campos" method="post" action="/agenda/agendar" asp-antiforgery="true">
+      <input type="hidden" name="horario" value="@sel.Horario.Id"><input type="hidden" name="profissional" value="@s.Profissional"><input type="hidden" name="semana" value="@s.Deslocamento">
+      <label>@T["comum.paciente"]
+        <select class="sel" name="paciente" required>
+          <option value="">@T["comum.escolha"]</option>
+          @foreach (var p in Model.Pacientes)
+          {
+            <option value="@p.Codigo">@p.Codigo · @p.Nome</option>
+          }
+        </select>
+      </label>
+      <label>@T["agenda.motivo"]<textarea class="campo" name="motivo" maxlength="200" data-contar></textarea></label>
+      <button class="btn primario linha-inicio" type="submit">@T["agenda.agendar"]</button>
+    </form>
+  </dialog>
+}
+else if (sel is { Agendamento: not null, Paciente: not null } && Model.Dados is { } d)
+{
+  var a = sel.Agendamento;
+  var p = sel.Paciente;
+  var podeMudar = a.Estado is EstadoAgendamento.Agendado or EstadoAgendamento.Confirmado;
+  <dialog class="modal" data-modal data-volta="/agenda?@volta" aria-labelledby="modal-titulo">
+    <header><h2 id="modal-titulo">@p.Nome <span class="mono mut">@p.Codigo</span></h2><button class="btn peq" type="button" data-fechar aria-label="@T["comum.fechar"]">✕</button></header>
+    <div class="corpo pilha">
+      <dl class="dados">
+        <div><dt>@T["comum.estado"]</dt><dd><span class="selo @Apresentacao.Selo(a.Estado)">@T["estado." + a.Estado]</span></dd></div>
+        <div><dt>@T["comum.horario"]</dt><dd class="mono">@sel.Horario.Inicio.ToString("dd/MM/yyyy HH:mm")</dd></div>
+        <div><dt>@T["comum.medico"]</dt><dd>@sel.Horario.ProfissionalId</dd></div>
+        <div><dt>@T["comum.sexo"]</dt><dd>@T["sexo." + p.Sexo]</dd></div>
+        <div><dt>@T["comum.idade"]</dt><dd>@d.Idade @T["comum.anos"]</dd></div>
+        <div><dt>@T["agenda.motivoRotulo"]</dt><dd class="quebra">@(d.Motivo ?? T["agenda.semMotivo"])</dd></div>
+      </dl>
+      <div class="linha-flex">
+        <a class="btn peq" href="/pacientes/@p.Id">@T["agenda.verFicha"]</a>
+      </div>
+      @if (podeMudar && Context.Pode(Acao.Reagendar))
+      {
+        <div class="linha-flex">
+          @if (a.Estado == EstadoAgendamento.Agendado)
+          {
+            <form method="post" action="/agenda/@a.Id/confirmar" asp-antiforgery="true"><input type="hidden" name="profissional" value="@s.Profissional"><input type="hidden" name="semana" value="@s.Deslocamento"><button class="btn primario" type="submit">@T["agenda.confirmar"]</button></form>
+          }
+          <form method="post" action="/agenda/@a.Id/cancelar" asp-antiforgery="true"><input type="hidden" name="profissional" value="@s.Profissional"><input type="hidden" name="semana" value="@s.Deslocamento"><button class="btn perigo" type="submit">@T["agenda.cancelar"]</button></form>
+          <form method="post" action="/agenda/@a.Id/reagendar" class="linha-flex" asp-antiforgery="true">
+            <input type="hidden" name="profissional" value="@s.Profissional"><input type="hidden" name="semana" value="@s.Deslocamento">
+            <select class="sel" name="horario" aria-label="@T["agenda.novoHorario"]">
+              @foreach (var l in s.Celulas.Where(c => c.Agendamento is null && !c.Passado))
+              {
+                <option value="@l.Horario.Id">@l.Horario.Inicio.ToString("dd/MM HH:mm")</option>
+              }
+            </select>
+            <button class="btn" type="submit">@T["agenda.reagendar"]</button>
+          </form>
+        </div>
+      }
+      else
+      {
+        <p class="mut">@T["agenda.semAcao"]</p>
+      }
+    </div>
+  </dialog>
+}

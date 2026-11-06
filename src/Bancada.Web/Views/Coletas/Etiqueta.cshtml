@@ -1,0 +1,10 @@
+@model LinhaDaAmostra
+@{ var a = Model.Amostra; }
+<partial name="_Titulo" model='("menu.coleta", "coleta.etiqueta", (string?)"coleta.etiquetaSub")' />
+<div class="etiqueta">
+  @Graficos.CodigoDeBarras(Model.Barras, a.Etiqueta)
+  <b>@a.Etiqueta</b>
+  <span>@Model.Paciente.Codigo · @Model.Pedido.Codigo</span>
+  <span>@T["material." + a.Material] · @a.ColetadaEm.ToString("dd/MM HH:mm")</span>
+</div>
+<div class="linha-flex"><a class="btn" href="/etiquetas">@T["comum.voltar"]</a><button class="btn primario" type="button" data-imprimir>@T["coleta.imprimir"]</button></div>

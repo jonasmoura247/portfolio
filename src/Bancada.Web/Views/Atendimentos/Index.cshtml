@@ -1,0 +1,118 @@
+@model IReadOnlyList<LinhaDoAgendamento>
+@{
+    var semana = (bool)ViewBag.Semana;
+    var resumo = ViewBag.Resumo as ResumoDoAtendimento;
+}
+<div class="linha-flex entre">
+  <div><p class="dev">@T["menu.atendimento"]</p><h1>@T["atendimento.titulo"]</h1></div>
+  <a class="btn" href="/atendimentos?semana=@(!semana)">@T[semana ? "atendimento.soHoje" : "atendimento.semana"]</a>
+</div>
+<section class="painel">
+  <div class="cab"><h3>@T["atendimento.fila"]</h3><span class="mut pequeno">@T["atendimento.filaNota"]</span></div>
+  @if (Model.Count == 0)
+  {
+    <p class="mut vazio">@T["atendimento.vazia"]</p>
+  }
+  else
+  {
+    <div class="rolagem"><table>
+      <thead><tr><th>@T["comum.horario"]</th><th>@T["comum.paciente"]</th><th>@T["comum.medico"]</th><th>@T["comum.estado"]</th><th></th></tr></thead>
+      <tbody>
+        @foreach (var l in Model)
+        {
+          var e = l.Agendamento.Estado;
+          <tr class="clicavel" data-href="/atendimentos?semana=@semana&abrir=@l.Agendamento.Id">
+            <td class="mono"><a class="discreto" href="/atendimentos?semana=@semana&abrir=@l.Agendamento.Id">@l.Horario.Inicio.ToString("dd/MM HH:mm")</a></td><td>@l.Paciente.Codigo · @l.Paciente.Nome</td><td>@l.Horario.ProfissionalId</td>
+            <td><span class="selo @Apresentacao.Selo(e)">@T["estado." + e]</span></td>
+            <td>
+              @if (e is EstadoAgendamento.Agendado or EstadoAgendamento.Confirmado && Context.Pode(Acao.FazerCheckIn))
+              {
+                <form method="post" action="/atendimentos/@l.Agendamento.Id/checkin" asp-antiforgery="true"><button class="btn peq" type="submit">@T["atendimento.checkin"]</button></form>
+              }
+              else if (e == EstadoAgendamento.ChegouCheckIn && Context.Pode(Acao.IniciarAtendimento))
+              {
+                <form method="post" action="/atendimentos/@l.Agendamento.Id/iniciar" asp-antiforgery="true"><button class="btn peq primario" type="submit">@T["atendimento.iniciar"]</button></form>
+              }
+              else if (e is EstadoAgendamento.EmAtendimento or EstadoAgendamento.Concluido && Context.Pode(Acao.VerAtendimento))
+              {
+                <a class="btn peq" href="/atendimentos/@l.Agendamento.Id">@T["atendimento.abrir"]</a>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table></div>
+  }
+</section>
+@if (resumo is not null)
+{
+  var a = resumo.Linha.Agendamento;
+  var h = resumo.Linha.Horario;
+  var p = resumo.Linha.Paciente;
+  var podeAbrir = a.Estado is EstadoAgendamento.EmAtendimento or EstadoAgendamento.Concluido && Context.Pode(Acao.VerAtendimento);
+  <dialog class="modal" data-modal data-volta="/atendimentos?semana=@semana" aria-labelledby="modal-titulo">
+    <header><h2 id="modal-titulo">@p.Nome <span class="mono mut">@p.Codigo</span></h2><button class="btn peq" type="button" data-fechar aria-label="@T["comum.fechar"]">✕</button></header>
+    <div class="corpo pilha">
+      <dl class="dados">
+        <div><dt>@T["comum.estado"]</dt><dd><span class="selo @Apresentacao.Selo(a.Estado)">@T["estado." + a.Estado]</span></dd></div>
+        <div><dt>@T["comum.horario"]</dt><dd class="mono">@h.Inicio.ToString("dd/MM/yyyy HH:mm")</dd></div>
+        <div><dt>@T["comum.medico"]</dt><dd>@h.ProfissionalId</dd></div>
+        <div><dt>@T["comum.sexo"]</dt><dd>@T["sexo." + p.Sexo]</dd></div>
+        <div><dt>@T["comum.idade"]</dt><dd>@resumo.Idade @T["comum.anos"]</dd></div>
+        @if (a.ChegadaEm is { } chegada)
+        {
+          <div><dt>@T["atendimento.chegada"]</dt><dd class="mono">@chegada.ToString("HH:mm")</dd></div>
+        }
+        @if (a.ChegadaEm is { } c1 && a.IniciadoEm is { } ini)
+        {
+          <div><dt>@T["atendimento.espera"]</dt><dd class="mono">@((int)(ini - c1).TotalMinutes) @T["atendimento.min"]</dd></div>
+        }
+        @if (a.IniciadoEm is { } i2 && a.ConcluidoEm is { } fim)
+        {
+          <div><dt>@T["atendimento.duracao"]</dt><dd class="mono">@((int)(fim - i2).TotalMinutes) @T["atendimento.min"]</dd></div>
+        }
+      </dl>
+      <div>
+        <h3>@T["atendimento.examesPedidos"]</h3>
+        @if (resumo.Pedidos.Count == 0)
+        {
+          <p class="mut">@T["atendimento.nenhumExame"]</p>
+        }
+        else
+        {
+          <div class="linha-flex">
+            @foreach (var x in resumo.Pedidos)
+            {
+              <a class="chip a" href="/pedidos/@x.Id">@x.Codigo</a>
+            }
+          </div>
+        }
+      </div>
+      <div class="pilha">
+        <h3>@T["atendimento.deste"]</h3>
+        @if (!Context.Pode(Acao.VerEvolucoes))
+        {
+          <p class="mut">@T["atendimento.semAcessoClinico"]</p>
+        }
+        else if (resumo.Evolucoes.Count == 0)
+        {
+          <p class="mut">@T["atendimento.semRegistros"]</p>
+        }
+        else
+        {
+          foreach (var e in resumo.Evolucoes)
+          {
+            <div class="evolucao"><span class="rotulo">@e.Evolucao.CriadaEm.ToString("dd/MM HH:mm") · @e.Evolucao.AutorId</span><p>@e.Texto</p></div>
+          }
+        }
+      </div>
+      <div class="linha-flex">
+        <a class="btn peq" href="/pacientes/@p.Id">@T["agenda.verFicha"]</a>
+        @if (podeAbrir)
+        {
+          <a class="btn peq primario" href="/atendimentos/@a.Id">@T["atendimento.abrirCompleto"]</a>
+        }
+      </div>
+    </div>
+  </dialog>
+}

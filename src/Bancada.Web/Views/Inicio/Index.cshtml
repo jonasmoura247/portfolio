@@ -1,0 +1,42 @@
+@{
+    var sessao = Context.Sessao();
+    string[][] passos =
+    [
+        ["agenda", "/agenda"], ["atendimento", "/atendimentos"], ["pedido", "/pedidos"], ["coleta", "/coletas"], ["soroteca", "/soroteca"],
+        ["equipamento", "/equipamentos"], ["resultados", "/resultados"], ["auditoria", "/auditoria"],
+    ];
+    var etapas = passos.Select(p => (T["fluxo." + p[0]], sessao.Visitados.Contains(p[1]))).ToList();
+}
+<section class="heroi">
+  <div class="linha-flex"><span class="ponto" aria-hidden="true"></span><span class="mono mut">@T["inicio.isolada"]</span></div>
+  <h1>@T["inicio.titulo"]</h1>
+  <p class="sub">@T["inicio.sub"]</p>
+  <div class="fig enxuta">@Graficos.Fluxo(etapas, T["inicio.fluxo"])</div>
+</section>
+<div class="duas">
+  <section class="painel">
+    <div class="cab"><h3>@T["inicio.roteiro"]</h3><span class="mono mut">@etapas.Count(e => e.Item2)/@etapas.Count</span></div>
+    <div class="corpo">
+      <ul class="passos">
+        @for (var i = 0; i < passos.Length; i++)
+        {
+          <li class="@(etapas[i].Item2 ? "feito" : null)"><span class="marca" aria-hidden="true"></span><span>@(i + 1). @T["roteiro." + passos[i][0]]</span><a class="btn peq" href="@passos[i][1]">@T["comum.ir"]</a></li>
+        }
+      </ul>
+    </div>
+  </section>
+  <section class="painel">
+    <div class="cab"><h3>@T["inicio.cenarios"]</h3></div>
+    <div class="corpo">
+      <div class="cenarios">
+        @foreach (var c in Cenarios.Todos)
+        {
+          <div class="cenario @(c == sessao.Cenario ? "atual" : null)">
+            <b>@T["cenario." + c]</b><span class="mut pequeno">@T["cenario." + c + ".texto"]</span>
+            <form method="post" asp-controller="Sessao" asp-action="Cenario"><input type="hidden" name="cenario" value="@c"><button class="btn peq" type="submit">@T[c == sessao.Cenario ? "inicio.carregado" : "inicio.carregar"]</button></form>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+</div>

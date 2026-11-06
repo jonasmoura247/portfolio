@@ -1,0 +1,9 @@
+{
+  "name": "bancada",
+  "private": true,
+  "type": "module",
+  "description": "Sem dependências: o JavaScript do Bancada roda sem biblioteca e é testado com o runner nativo do Node.",
+  "scripts": {
+    "test:js": "node --test --experimental-test-coverage --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 --test-coverage-include=src/Bancada.Web/wwwroot/js/**/*.js \"tests/js/**/*.test.js\""
+  }
+}

@@ -1,0 +1,31 @@
+@model IReadOnlyList<LinhaDaAmostra>
+@{ var busca = ViewBag.Busca as string; }
+<partial name="_Titulo" model='("menu.etiquetas", "menu.etiquetas", (string?)"etiqueta.sub")' />
+<form method="get" action="/etiquetas" class="linha-flex">
+  <input class="campo" type="search" name="busca" value="@busca" maxlength="64" aria-label="@T["etiqueta.busca"]" placeholder="@T["etiqueta.busca"]">
+  <button class="btn primario" type="submit">@T["comum.buscar"]</button>
+</form>
+<section class="painel">
+  @if (Model.Count == 0)
+  {
+    <p class="mut vazio">@T["etiqueta.vazia"]</p>
+  }
+  else
+  {
+    <div class="rolagem"><table>
+      <thead><tr><th>@T["coleta.etiqueta"]</th><th>@T["comum.paciente"]</th><th>@T["coleta.tubo"]</th><th>@T["comum.estado"]</th><th></th></tr></thead>
+      <tbody>
+        @foreach (var a in Model)
+        {
+          <tr class="clicavel" data-href="/amostras/@a.Amostra.Id/etiqueta">
+            <td class="mono"><a href="/amostras/@a.Amostra.Id/etiqueta">@a.Amostra.Etiqueta</a></td>
+            <td>@a.Paciente.Codigo · @a.Paciente.Nome</td>
+            <td>@T["material." + a.Amostra.Material]</td>
+            <td><span class="selo @Apresentacao.Selo(a.Amostra.Estado)">@T["estado." + a.Amostra.Estado]</span></td>
+            <td><a class="btn peq" href="/amostras/@a.Amostra.Id/etiqueta">@T["coleta.verEtiqueta"]</a></td>
+          </tr>
+        }
+      </tbody>
+    </table></div>
+  }
+</section>

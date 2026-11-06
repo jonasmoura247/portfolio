@@ -1,0 +1,77 @@
+@{
+    var sessao = Context.Sessao();
+    var aviso = sessao.Aviso;
+    sessao.Aviso = null;
+}
+<!doctype html>
+<html lang="@sessao.Idioma">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>@T["app.nome"]</title>
+  <link rel="stylesheet" href="~/css/estilo.css" asp-append-version="true">
+</head>
+<body>
+  <a class="pular" href="#conteudo">@T["nav.pular"]</a>
+  <header class="topo">
+    <div class="gut barra">
+      <span class="logo"><i aria-hidden="true"></i>@T["app.nome"].ToUpperInvariant()</span>
+      <div class="ctl">
+        <form method="post" asp-controller="Sessao" asp-action="Papel">
+          <label>@T["topo.papel"]
+            <select class="sel troca" name="papel" data-auto-enviar>
+              @foreach (var p in Enum.GetValues<Papel>())
+              {
+                <option value="@p" selected="@(p == sessao.Papel)">@T["papel." + p]</option>
+              }
+            </select>
+          </label>
+        </form>
+        <form method="post" asp-controller="Sessao" asp-action="Operador">
+          <label>@T["topo.operador"]
+            <select class="sel troca" name="operador" data-auto-enviar>
+              @foreach (var o in Operadores.DoPapel(sessao.Papel))
+              {
+                <option value="@o.Id" selected="@(o.Id == sessao.Operador)">@o.Id · @o.Nome</option>
+              }
+            </select>
+          </label>
+        </form>
+        <form method="post" asp-controller="Sessao" asp-action="Idioma">
+          <label>@T["topo.idioma"]
+            <select class="sel" name="idioma" data-auto-enviar>
+              @foreach (var i in CatalogoDeTextos.Idiomas)
+              {
+                <option value="@i" selected="@(i == sessao.Idioma)">@i.ToUpperInvariant()</option>
+              }
+            </select>
+          </label>
+        </form>
+        <span class="sessao" title="@T["topo.sessao"]">@T["topo.sessao"] @sessao.Id[..8]…</span>
+        <a class="btn" href="/">@T["topo.portfolio"]</a>
+        <button class="btn" type="button" data-alternar-tema>@T["topo.tema"]</button>
+        <form method="post" asp-controller="Sessao" asp-action="Reiniciar">
+          <button class="btn" type="submit">@T["topo.reiniciar"]</button>
+        </form>
+      </div>
+    </div>
+  </header>
+  <div class="faixa"><div class="gut">@T["aviso.ficticio"]</div></div>
+  <div class="app">
+    <nav class="menu" aria-label="@T["menu.rotulo"]">
+      @foreach (var m in Modulos.Todos.Where(x => x.VisivelPara(sessao.Papel)))
+      {
+        <a href="@m.Rota" aria-current="@(Context.Request.Path == m.Rota ? "page" : null)">@T[m.TextoChave]</a>
+      }
+    </nav>
+    <main class="tela" id="conteudo" tabindex="-1">
+      @if (aviso is { } a)
+      {
+        <div class="alerta @(a.Sucesso ? "ok" : "critico")" role="@(a.Sucesso ? "status" : "alert")"><span aria-hidden="true">@(a.Sucesso ? "✓" : "!")</span><div>@T[a.Chave]</div></div>
+      }
+      @RenderBody()
+    </main>
+  </div>
+  <script type="module" src="~/js/app.js" asp-append-version="true"></script>
+</body>
+</html>

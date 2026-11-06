@@ -1,0 +1,656 @@
+<title>Prévia do Bancada</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: cabeçalho do portfólio com abas; cada aba é uma página. A aba "Dentro do Bancada" mostra o sistema em janelas. Visual de dev moderno com cor contida: base azul-ardósia, três acentos suaves (índigo, azul-petróleo, violeta) e cor forte só para estado. */
+:root {
+  --fundo: #f5f6fa; --superficie: #ffffff; --superficie-2: #eef0f6; --linha: #dde1ea;
+  --texto: #1a2030; --texto-2: #596378;
+  --acento: #3a5bc0; --acento-2: #1a7a70; --acento-3: #6b4fb3; --sobre-acento: #ffffff;
+  --ok: #277a4c; --atencao: #8a5a0a; --perigo: #b03a48;
+  --pontos: rgba(26, 32, 48, .09);
+  --f-corpo: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, Menlo, monospace;
+  --raio: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fundo: #0e1219; --superficie: #141922; --superficie-2: #1a2030; --linha: #262e3d;
+    --texto: #e4e8f0; --texto-2: #98a3b8;
+    --acento: #86a2ec; --acento-2: #5cc1b2; --acento-3: #b4a0e6; --sobre-acento: #0e1219;
+    --ok: #72c492; --atencao: #e0b062; --perigo: #ee8d98;
+    --pontos: rgba(228, 232, 240, .07);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fundo: #0e1219; --superficie: #141922; --superficie-2: #1a2030; --linha: #262e3d;
+  --texto: #e4e8f0; --texto-2: #98a3b8;
+  --acento: #86a2ec; --acento-2: #5cc1b2; --acento-3: #b4a0e6; --sobre-acento: #0e1219;
+  --ok: #72c492; --atencao: #e0b062; --perigo: #ee8d98;
+  --pontos: rgba(228, 232, 240, .07);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; animation: none !important; } }
+body { margin: 0; background-color: var(--fundo); color: var(--texto); font: 400 15px/1.55 var(--f-corpo); -webkit-text-size-adjust: 100%;
+  background-image: radial-gradient(var(--pontos) 1px, transparent 1px); background-size: 22px 22px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--superficie); }
+a { color: var(--acento); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; border-radius: 4px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.gut { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.rotulo { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--texto-2); }
+.dev { font: 500 13px var(--f-mono); color: var(--acento-2); }
+.mono { font-family: var(--f-mono); font-size: 13px; }
+.rolagem { overflow-x: auto; }
+.mut { color: var(--texto-2); }
+kbd { font: 600 11px var(--f-mono); border: 1px solid var(--linha); border-bottom-width: 2px; border-radius: 4px; padding: 1px 6px; background: var(--superficie-2); color: var(--texto-2); }
+.ponto { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 22%, transparent); }
+
+.prototipo { background: color-mix(in srgb, var(--atencao) 12%, var(--superficie)); border-bottom: 1px solid var(--linha); font-size: 13px; }
+.prototipo .gut { padding-block: 8px; }
+
+/* cabeçalho do portfólio */
+.topo { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--superficie) 92%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid var(--linha); }
+.topo .barra { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 10px; }
+.marca { display: flex; align-items: center; gap: 10px; font-weight: 650; }
+.monograma { width: 28px; height: 28px; border-radius: 7px; background: var(--acento); color: var(--sobre-acento); display: grid; place-items: center; font: 700 12px var(--f-mono); }
+.marca small { color: var(--texto-2); font-weight: 500; font-family: var(--f-mono); font-size: 12px; }
+.abas { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.abas::-webkit-scrollbar { display: none; }
+.aba { flex: 0 0 auto; border: 0; background: transparent; color: var(--texto-2); font: 600 14px var(--f-corpo); padding: 10px 14px; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
+.aba:hover { color: var(--texto); }
+.aba[aria-selected="true"] { color: var(--texto); border-bottom-color: var(--acento); }
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--linha); background: var(--superficie); color: var(--texto); font: 600 13px var(--f-corpo); padding: 8px 12px; min-height: 36px; border-radius: 7px; cursor: pointer; text-decoration: none; transition: border-color .15s, background .15s; }
+.btn:hover { border-color: var(--acento); }
+.btn.primario { background: var(--acento); border-color: var(--acento); color: var(--sobre-acento); }
+.btn.primario:hover { background: color-mix(in srgb, var(--acento) 88%, var(--texto)); }
+.btn.perigo { color: var(--perigo); border-color: color-mix(in srgb, var(--perigo) 60%, var(--linha)); }
+.btn[disabled] { opacity: .55; cursor: not-allowed; }
+
+main { padding-block: 30px 64px; }
+.pagina[hidden] { display: none; }
+.pagina > header { margin-bottom: 22px; }
+.pagina h1 { font-size: clamp(26px, 4.5vw, 36px); font-weight: 700; line-height: 1.15; letter-spacing: -.01em; }
+.pagina h1 em { font-style: normal; color: var(--acento); }
+.pagina h2 { font-size: 18px; font-weight: 600; margin: 30px 0 12px; }
+.sub { color: var(--texto-2); margin-top: 8px; max-width: 70ch; }
+
+/* paleta */
+.fichas { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.ficha { background: var(--superficie); border: 1px solid var(--linha); border-radius: var(--raio); overflow: hidden; min-width: 0; }
+.amostras { display: grid; grid-template-columns: 1fr 1fr; height: 56px; }
+.amostras span { display: flex; align-items: flex-end; padding: 4px 8px; font: 600 11px var(--f-mono); }
+.ficha .info { padding: 10px 12px; display: grid; gap: 2px; }
+.ficha b { font-weight: 600; }
+.ficha .num { font: 12px var(--f-mono); color: var(--texto-2); }
+.ficha .ctr { font-size: 12px; color: var(--texto-2); }
+.codigo { background: var(--superficie-2); border: 1px solid var(--linha); border-radius: var(--raio); padding: 14px 16px; font: 13px/1.7 var(--f-mono); overflow-x: auto; white-space: pre; }
+.codigo .c { color: var(--texto-2); } .codigo .p { color: var(--acento-3); } .codigo .v { color: var(--acento-2); } .codigo .a { color: var(--acento); }
+
+/* componentes */
+.painel { background: var(--superficie); border: 1px solid var(--linha); border-radius: var(--raio); min-width: 0; }
+.painel > .cab { padding: 12px 16px; border-bottom: 1px solid var(--linha); display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.painel > .cab h3 { font-size: 15px; font-weight: 600; }
+.painel > .corpo { padding: 16px; }
+.selo { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, currentColor 55%, transparent); background: color-mix(in srgb, currentColor 9%, transparent); white-space: nowrap; }
+.selo::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.s-neutro { color: var(--texto-2); } .s-acento { color: var(--acento); } .s-ok { color: var(--ok); } .s-atencao { color: var(--atencao); } .s-perigo { color: var(--perigo); } .s-teal { color: var(--acento-2); } .s-violeta { color: var(--acento-3); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th { text-align: left; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--texto-2); padding: 8px 12px; border-bottom: 1px solid var(--linha); white-space: nowrap; }
+td { padding: 8px 12px; border-bottom: 1px solid var(--linha); white-space: nowrap; }
+tbody tr:nth-child(even) { background: color-mix(in srgb, var(--superficie-2) 55%, transparent); }
+.num-t { font-variant-numeric: tabular-nums; text-align: right; }
+.flag { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 22px; padding: 0 6px; border-radius: 4px; font: 700 12px var(--f-mono); border: 1px solid currentColor; }
+.f-n { color: var(--ok); } .f-a { color: var(--atencao); } .f-c { color: var(--perigo); background: color-mix(in srgb, var(--perigo) 12%, transparent); }
+.alerta { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--atencao) 70%, var(--linha)); background: color-mix(in srgb, var(--atencao) 10%, var(--superficie)); font-size: 14px; }
+.alerta.critico { border-color: color-mix(in srgb, var(--perigo) 70%, var(--linha)); background: color-mix(in srgb, var(--perigo) 10%, var(--superficie)); }
+.alerta > span { font: 700 13px var(--f-mono); }
+.duas { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start; }
+.pilha { display: grid; gap: 16px; min-width: 0; }
+.linha-flex { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* portfólio */
+.heroi { background: var(--superficie); border: 1px solid var(--linha); border-radius: var(--raio); padding: 22px; display: grid; gap: 10px; margin-bottom: 18px; }
+.heroi h2 { margin: 0; font-size: clamp(22px, 4vw, 30px); font-weight: 700; letter-spacing: -.01em; }
+.projeto { background: var(--superficie); border: 1px solid var(--linha); border-radius: var(--raio); padding: 18px; display: grid; gap: 10px; min-width: 0; }
+.projeto.destaque { border-color: color-mix(in srgb, var(--acento) 55%, var(--linha)); box-shadow: inset 0 2px 0 var(--acento); }
+.projeto h3 { font-size: 17px; font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 600 12px var(--f-mono); padding: 2px 9px; border: 1px solid var(--linha); border-radius: 6px; color: var(--texto-2); background: var(--superficie-2); }
+.chip.a { color: var(--acento); border-color: color-mix(in srgb, var(--acento) 45%, var(--linha)); }
+.chip.t { color: var(--acento-2); border-color: color-mix(in srgb, var(--acento-2) 45%, var(--linha)); }
+.chip.v { color: var(--acento-3); border-color: color-mix(in srgb, var(--acento-3) 45%, var(--linha)); }
+
+/* janela do sistema */
+.janela { border: 1px solid var(--linha); border-radius: 12px; overflow: hidden; background: var(--fundo); }
+.janela .bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--superficie); border-bottom: 1px solid var(--linha); }
+.janela .pontos { display: flex; gap: 6px; }
+.janela .pontos i { width: 9px; height: 9px; border-radius: 50%; background: var(--linha); display: block; }
+.janela .url { flex: 1; min-width: 0; font: 12px var(--f-mono); color: var(--texto-2); background: var(--superficie-2); border-radius: 5px; padding: 3px 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.janela .url b { color: var(--acento-2); font-weight: 600; }
+.app-topo { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 14px; background: var(--superficie); border-bottom: 1px solid var(--linha); }
+.app-topo .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; letter-spacing: .08em; font-size: 13px; }
+.app-topo .logo i { width: 18px; height: 18px; border-radius: 5px; background: var(--acento); display: block; position: relative; }
+.app-topo .logo i::after { content: ""; position: absolute; inset: 5px; border-radius: 2px; background: var(--superficie); }
+.app-topo .ctl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.sel { border: 1px solid var(--linha); background: var(--superficie-2); color: var(--texto); font: 600 13px var(--f-corpo); padding: 6px 10px; border-radius: 7px; min-height: 34px; }
+.faixa { background: color-mix(in srgb, var(--atencao) 12%, var(--superficie)); font-size: 12px; padding: 5px 14px; border-bottom: 1px solid var(--linha); }
+.app { display: grid; grid-template-columns: 190px minmax(0, 1fr); min-height: 460px; }
+@media (max-width: 760px) { .app { grid-template-columns: minmax(0, 1fr); } .menu { flex-direction: row !important; overflow-x: auto; border-right: 0 !important; border-bottom: 1px solid var(--linha); } }
+.menu { display: flex; flex-direction: column; gap: 2px; padding: 10px 8px; background: var(--superficie); border-right: 1px solid var(--linha); }
+.menu button { text-align: left; border: 0; background: transparent; color: var(--texto-2); font: 600 14px var(--f-corpo); padding: 9px 12px; border-radius: 7px; cursor: pointer; white-space: nowrap; }
+.menu button:hover { color: var(--texto); background: color-mix(in srgb, var(--texto) 5%, transparent); }
+.menu button[aria-selected="true"] { color: var(--acento); background: color-mix(in srgb, var(--acento) 13%, transparent); }
+.tela { padding: 16px; min-width: 0; display: grid; gap: 16px; align-content: start; }
+.tela[hidden] { display: none; }
+.tela h2 { font-size: 18px; font-weight: 600; margin: 0; }
+
+.agenda td, .agenda th { padding: 6px 8px; }
+.agenda td.hora { color: var(--texto-2); font: 12px var(--f-mono); width: 56px; }
+.agenda td { min-width: 118px; height: 44px; }
+.agenda .livre { color: var(--texto-2); font-size: 12px; }
+.agenda tbody tr:nth-child(even) { background: transparent; }
+.marc { display: grid; gap: 2px; font-size: 12px; }
+.marc b { font-size: 13px; }
+
+.tempo { list-style: none; margin: 0; padding: 0; }
+.tempo li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--linha); font-size: 14px; }
+.tempo li:last-child { border-bottom: 0; }
+.tempo time { font: 12px var(--f-mono); color: var(--texto-2); padding-top: 2px; }
+.evolucao { border-left: 2px solid color-mix(in srgb, var(--acento-3) 60%, var(--linha)); padding-left: 12px; display: grid; gap: 4px; }
+
+.mapa { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; max-width: 420px; }
+.pos { aspect-ratio: 1; border: 1px solid var(--linha); border-radius: 5px; background: var(--superficie-2); cursor: pointer; padding: 0; font: 600 10px var(--f-mono); color: var(--texto-2); }
+.pos:hover { border-color: var(--acento); }
+.pos.oc { background: color-mix(in srgb, var(--acento) 28%, var(--superficie)); border-color: color-mix(in srgb, var(--acento) 55%, var(--linha)); color: var(--texto); }
+.pos.vd { background: color-mix(in srgb, var(--atencao) 32%, var(--superficie)); border-color: var(--atencao); color: var(--texto); }
+.pos.vc { background: color-mix(in srgb, var(--perigo) 30%, var(--superficie)); border-color: var(--perigo); color: var(--texto); }
+.pos[aria-pressed="true"] { outline: 2px solid var(--texto); outline-offset: 1px; }
+.legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--texto-2); }
+.legenda i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--linha); vertical-align: -1px; margin-right: 5px; }
+
+.fila { display: grid; gap: 10px; }
+.item-fila { display: grid; gap: 6px; font-size: 14px; }
+.barra-prog { height: 6px; border-radius: 3px; background: var(--linha); overflow: hidden; }
+.barra-prog span { display: block; height: 100%; background: var(--acento-2); width: var(--p); }
+.prot { background: var(--superficie-2); border: 1px solid var(--linha); border-radius: 8px; padding: 10px 12px; font: 12px/1.7 var(--f-mono); overflow-x: auto; white-space: pre; }
+.prot .tm { color: var(--texto-2); } .prot .cima { color: var(--acento); } .prot .baixo { color: var(--acento-2); } .prot .reg { color: var(--acento-3); } .prot .ck { color: var(--atencao); }
+
+.numeros { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.numero { background: var(--superficie); border: 1px solid var(--linha); border-radius: var(--raio); padding: 12px; display: grid; gap: 2px; }
+.numero b { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cobertura { display: grid; gap: 8px; }
+.cob { display: grid; grid-template-columns: minmax(110px, 190px) minmax(0, 1fr) 52px; gap: 10px; align-items: center; font-size: 13px; }
+.cob .trilho { height: 8px; border-radius: 4px; background: var(--linha); overflow: hidden; }
+.cob .trilho span { display: block; height: 100%; width: var(--p); background: var(--ok); }
+.cob .pc { text-align: right; font: 600 12px var(--f-mono); }
+.console { background: var(--superficie-2); border: 1px solid var(--linha); border-radius: 8px; padding: 10px 12px; font: 12px/1.65 var(--f-mono); height: 190px; overflow: auto; white-space: pre-wrap; }
+.console .ok { color: var(--ok); } .console .tm { color: var(--texto-2); } .console .pr { color: var(--acento-2); }
+.camadas { display: grid; gap: 6px; font-size: 13px; }
+.camada { border: 1px solid var(--linha); border-radius: 7px; padding: 7px 12px; background: var(--superficie-2); display: flex; justify-content: space-between; gap: 10px; }
+.camada span:first-child { font-family: var(--f-mono); }
+.camada span:last-child { color: var(--texto-2); font-size: 12px; text-align: right; }
+.camada.seta { color: var(--texto-2); font-size: 12px; justify-content: center; background: transparent; padding: 0; border: 0; }
+footer { color: var(--texto-2); font-size: 13px; padding-block: 20px 28px; border-top: 1px solid var(--linha); }
+</style>
+
+<div class="prototipo"><div class="gut"><b>Protótipo visual.</b> Telas e números são de exemplo. O Bancada ainda não foi codificado; esta página só mostra paleta e aparência.</div></div>
+
+<header class="topo">
+  <div class="gut barra">
+    <div class="marca"><span class="monograma" aria-hidden="true">JC</span><span>Jonas Cavalcante <small>~/dev-net</small></span></div>
+    <button class="btn" id="tema" type="button">Tema</button>
+  </div>
+  <div class="gut">
+    <div class="abas" role="tablist" aria-label="Seções">
+      <button class="aba" role="tab" id="a-paleta" aria-controls="p-paleta" aria-selected="true">Paleta</button>
+      <button class="aba" role="tab" id="a-portfolio" aria-controls="p-portfolio" aria-selected="false">No portfólio</button>
+      <button class="aba" role="tab" id="a-bancada" aria-controls="p-bancada" aria-selected="false">Dentro do Bancada</button>
+    </div>
+  </div>
+</header>
+
+<main class="gut">
+
+  <!-- PALETA -->
+  <section class="pagina" id="p-paleta" role="tabpanel" aria-labelledby="a-paleta">
+    <header>
+      <p class="dev">// paleta</p>
+      <h1>Base <em>azul-ardósia</em>, três acentos suaves, cor forte só para estado</h1>
+      <p class="sub">Mais cor que a primeira versão, sem chegar ao neon: nada de gradiente nem brilho. Cada ficha mostra o tom nos dois temas (esquerda claro, direita escuro) e o contraste do texto sobre o fundo. O botão "Tema" alterna a página inteira.</p>
+    </header>
+
+    <div class="fichas" id="fichas"></div>
+
+    <h2>Como entra no código</h2>
+    <div class="codigo" id="tokens"></div>
+
+    <h2>Componentes</h2>
+    <div class="duas">
+      <div class="painel">
+        <div class="cab"><h3>Botões, selos e alertas</h3></div>
+        <div class="corpo pilha">
+          <div class="linha-flex">
+            <button class="btn primario" type="button">Agendar</button>
+            <button class="btn" type="button">Cancelar</button>
+            <button class="btn perigo" type="button">Descartar amostra</button>
+            <button class="btn" type="button" disabled>Indisponível</button>
+          </div>
+          <div class="linha-flex">
+            <span class="selo s-neutro">Agendado</span>
+            <span class="selo s-acento">Confirmado</span>
+            <span class="selo s-ok">Liberado</span>
+            <span class="selo s-atencao">Vence em 1 dia</span>
+            <span class="selo s-perigo">Crítico</span>
+          </div>
+          <div class="linha-flex">
+            <span class="chip a">C#</span><span class="chip a">ASP.NET MVC</span><span class="chip t">SQL Server</span><span class="chip t">Oracle</span><span class="chip v">JavaScript</span><span class="chip">Git</span>
+          </div>
+          <div class="alerta"><span aria-hidden="true">!</span><div><b>Alergia registrada:</b> látex. O pedido mostra este aviso.</div></div>
+          <div class="alerta critico"><span aria-hidden="true">!!</span><div><b>Valor crítico:</b> potássio 7,1 mmol/L. Confirme antes de validar.</div></div>
+        </div>
+      </div>
+      <div class="painel">
+        <div class="cab"><h3>Tabela e resultado fora da faixa</h3><span class="mut" style="font-size:13px">estado nunca só por cor</span></div>
+        <div class="rolagem">
+          <table>
+            <thead><tr><th>Analito</th><th class="num-t">Valor</th><th>Unid.</th><th>Referência</th><th>Flag</th></tr></thead>
+            <tbody>
+              <tr><td>Sódio</td><td class="num-t">138</td><td>mmol/L</td><td>135 – 145</td><td><span class="flag f-n">N</span></td></tr>
+              <tr><td>Glicose</td><td class="num-t">108</td><td>mg/dL</td><td>70 – 99</td><td><span class="flag f-a">H ▲</span></td></tr>
+              <tr><td>Potássio</td><td class="num-t"><b>7,1</b></td><td>mmol/L</td><td>3,5 – 5,1</td><td><span class="flag f-c">C ▲▲</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <h2>Tipografia</h2>
+    <div class="painel"><div class="corpo pilha">
+      <h1 style="font-size:28px;font-weight:700">Título de página, <em style="font-style:normal;color:var(--acento)">com destaque</em></h1>
+      <p style="font-size:18px;font-weight:600">Título de seção, 18 px</p>
+      <p>Texto corrido, 15 px, fonte do sistema: nada para baixar, nenhuma licença extra, nenhuma requisição de terceiros.</p>
+      <p class="rotulo">Rótulo em maiúsculas com espaçamento</p>
+      <p class="mono">AMO-000123 · PAC-0014 · 2026-11-04T09:30:00Z <kbd>Ctrl</kbd> <kbd>K</kbd></p>
+    </div></div>
+  </section>
+
+  <!-- NO PORTFÓLIO -->
+  <section class="pagina" id="p-portfolio" role="tabpanel" aria-labelledby="a-portfolio" hidden>
+    <header>
+      <p class="dev">// portfólio</p>
+      <h1>Como o <em>portfólio</em> fica com o Bancada</h1>
+      <p class="sub">Mesma paleta e tipografia do sistema. O Bancada entra como projeto principal, com selos que vêm do último build. Só projetos com Git público aparecem.</p>
+    </header>
+
+    <div class="heroi">
+      <span class="linha-flex"><span class="ponto" aria-hidden="true"></span><span class="mono mut">aberto a vagas · .NET pleno · CLT · remoto ou híbrido em Maringá</span></span>
+      <h2>Jonas Emanuel Moura Cavalcante</h2>
+      <p class="dev">// C# · ASP.NET MVC · SQL Server · Oracle · sistemas de saúde</p>
+      <p class="mut" style="max-width:68ch">Desenvolvo no ERP de saúde da Moderna Sistemas (Grupo Benner): prontuário, agenda, faturamento TISS e NFS-e. Antes, dois anos integrando equipamentos médicos em Java.</p>
+      <div class="linha-flex"><a class="btn primario" href="https://www.linkedin.com/in/jonas-emanuel-moura">LinkedIn</a><a class="btn" href="https://github.com/jonasmoura247">GitHub</a></div>
+    </div>
+
+    <div class="pilha">
+      <article class="projeto destaque">
+        <div class="linha-flex" style="justify-content:space-between">
+          <h3>Bancada · laboratório de demonstração</h3>
+          <span class="selo s-atencao">Em construção</span>
+        </div>
+        <p>Mini LIS fictício e funcional. Escolha um paciente, agende, atenda, abra o prontuário, peça exame, guarde a amostra na soroteca, veja o equipamento processar e leia o laudo. A tela técnica mostra a arquitetura, a segurança e roda os testes.</p>
+        <div class="chips">
+          <span class="chip a">C#</span><span class="chip a">ASP.NET Core MVC</span><span class="chip t">SQL</span><span class="chip v">JavaScript</span>
+          <span class="chip">.NET 10</span><span class="chip">EF Core</span><span class="chip">SQLite</span><span class="chip">ASTM / HL7</span>
+        </div>
+        <div class="linha-flex">
+          <span class="selo s-ok">100% de cobertura</span>
+          <span class="selo s-ok">Licenças MIT</span>
+          <span class="selo s-violeta">Mapa Security+</span>
+        </div>
+        <div class="linha-flex">
+          <button class="btn primario" type="button" disabled>Abrir demonstração (em breve)</button>
+          <button class="btn" type="button" disabled>Ver código no GitHub (em breve)</button>
+        </div>
+      </article>
+      <div class="duas">
+        <article class="projeto">
+          <h3>Konta</h3>
+          <p>App de controle financeiro 100% offline, publicado na Google Play. Sem cadastro, dados só no aparelho.</p>
+          <div class="chips"><span class="chip a">Flutter</span><span class="chip t">Hive</span><span class="chip">Riverpod</span></div>
+        </article>
+        <article class="projeto">
+          <h3>rpg-mesa</h3>
+          <p>Painel de mesa de RPG em .NET 8: API, núcleo de domínio e ingestor de conteúdo, com testes automatizados.</p>
+          <div class="chips"><span class="chip a">C#</span><span class="chip a">.NET 8</span><span class="chip">ASP.NET Core</span></div>
+          <a class="btn" href="https://github.com/jonasmoura247/rpg-mesa" style="justify-self:start">Ver no GitHub</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- DENTRO DO BANCADA -->
+  <section class="pagina" id="p-bancada" role="tabpanel" aria-labelledby="a-bancada" hidden>
+    <header>
+      <p class="dev">// bancada</p>
+      <h1>Dentro do <em>Bancada</em></h1>
+      <p class="sub">Cinco telas com dados de exemplo. Use o menu de dentro da janela, o mapa da soroteca e o botão "Rodar testes".</p>
+    </header>
+
+    <div class="janela">
+      <div class="bar"><div class="pontos" aria-hidden="true"><i></i><i></i><i></i></div><div class="url">https://bancada.exemplo/<b id="rota">agenda</b></div></div>
+      <div class="app-topo">
+        <span class="logo"><i aria-hidden="true"></i>BANCADA</span>
+        <div class="ctl">
+          <label for="papel" style="position:absolute;left:-9999px">Papel</label>
+          <select class="sel" id="papel"><option>Recepção</option><option>Médico(a)</option><option>Coleta</option><option>Analista</option><option>Admin</option></select>
+          <button class="btn" type="button">Buscar <kbd>Ctrl</kbd><kbd>K</kbd></button>
+          <button class="btn" type="button">PT · EN</button>
+          <button class="btn" type="button">Reiniciar sessão</button>
+        </div>
+      </div>
+      <div class="faixa">Dados fictícios. Simulação educacional: não é dispositivo médico e não deve ser usada em decisão clínica.</div>
+      <div class="app">
+        <nav class="menu" role="tablist" aria-label="Módulos" aria-orientation="vertical">
+          <button role="tab" data-tela="agenda" aria-selected="true">Agenda</button>
+          <button role="tab" data-tela="paciente" aria-selected="false">Paciente</button>
+          <button role="tab" data-tela="soroteca" aria-selected="false">Soroteca</button>
+          <button role="tab" data-tela="equipamento" aria-selected="false">Equipamento</button>
+          <button role="tab" data-tela="tecnico" aria-selected="false">Painel técnico</button>
+        </nav>
+
+        <div>
+          <section class="tela" data-painel="agenda">
+            <div class="linha-flex" style="justify-content:space-between">
+              <h2>Agenda · semana de 2 a 6 de novembro</h2>
+              <div class="linha-flex"><select class="sel" aria-label="Profissional"><option>Dra. Marta Leão (MED-01)</option><option>Dr. Caio Brandão (MED-02)</option></select><button class="btn primario" type="button">Novo agendamento</button></div>
+            </div>
+            <div class="painel rolagem"><table class="agenda" id="agenda"></table></div>
+            <div class="legenda" id="leg-agenda"></div>
+          </section>
+
+          <section class="tela" data-painel="paciente" hidden>
+            <div class="linha-flex" style="justify-content:space-between">
+              <div><h2>Rui Almeida <span class="mono mut">PAC-0014</span></h2><p class="mut">Masculino · 52 anos · atendimento em 04/11/2026 às 09:30</p></div>
+              <div class="linha-flex"><button class="btn" type="button">Registrar evolução</button><button class="btn primario" type="button">Pedir exame</button></div>
+            </div>
+            <div class="alerta"><span aria-hidden="true">!</span><div><b>Alergia registrada:</b> látex.</div></div>
+            <div class="duas">
+              <div class="painel"><div class="cab"><h3>Prontuário</h3><span class="selo s-violeta">texto cifrado em repouso</span></div>
+                <div class="corpo pilha">
+                  <div class="evolucao"><span class="rotulo">04/11 · 09:42 · Dra. Marta Leão</span><p>Paciente refere cansaço há duas semanas. Sem febre. Solicitados eletrólitos, glicose e creatinina.</p></div>
+                  <div class="evolucao"><span class="rotulo">21/09 · 14:10 · Dr. Caio Brandão</span><p>Retorno de rotina. Pressão controlada. Mantida conduta.</p></div>
+                  <div class="evolucao"><span class="rotulo">21/09 · 14:25 · correção da anterior</span><p>Onde se lê "controlada", leia-se "limítrofe, reavaliar em 30 dias".</p></div>
+                </div></div>
+              <div class="painel"><div class="cab"><h3>Linha do tempo</h3></div>
+                <div class="corpo"><ul class="tempo">
+                  <li><time>04/11 09:30</time><span>Check-in na recepção</span></li>
+                  <li><time>04/11 09:42</time><span>Atendimento concluído</span></li>
+                  <li><time>04/11 09:50</time><span>Pedido PED-000045 criado (ELE, GLI, CRE)</span></li>
+                  <li><time>04/11 10:05</time><span>Amostra AMO-000123 coletada · jejum confirmado</span></li>
+                  <li><time>04/11 10:40</time><span>Recebida · armazenada na posição A-2-4</span></li>
+                </ul></div></div>
+            </div>
+          </section>
+
+          <section class="tela" data-painel="soroteca" hidden>
+            <div class="linha-flex" style="justify-content:space-between"><h2>Soroteca · Rack 1 · Caixa A</h2><select class="sel" aria-label="Caixa"><option>Caixa A</option><option>Caixa B</option></select></div>
+            <div class="duas">
+              <div class="painel"><div class="corpo pilha">
+                <div class="mapa" id="mapa" role="group" aria-label="Posições da caixa, 9 por 9"></div>
+                <div class="legenda"><span><i style="background:var(--superficie-2)"></i>Livre</span><span><i style="background:color-mix(in srgb,var(--acento) 28%,var(--superficie))"></i>Ocupada</span><span><i style="background:color-mix(in srgb,var(--atencao) 32%,var(--superficie));border-color:var(--atencao)"></i>Vence em até 1 dia</span><span><i style="background:color-mix(in srgb,var(--perigo) 30%,var(--superficie));border-color:var(--perigo)"></i>Vencida</span></div>
+              </div></div>
+              <div class="painel"><div class="cab"><h3>Posição selecionada</h3></div>
+                <div class="corpo pilha" id="detalhe-pos"></div></div>
+            </div>
+          </section>
+
+          <section class="tela" data-painel="equipamento" hidden>
+            <div class="linha-flex" style="justify-content:space-between"><h2>Equipamentos</h2>
+              <div class="linha-flex"><span class="mut" style="font-size:13px">Relógio de simulação</span><button class="btn" type="button">Pausar</button><button class="btn" type="button">×1</button><button class="btn primario" type="button">×60</button><button class="btn" type="button">×600</button></div></div>
+            <div class="duas">
+              <div class="painel"><div class="cab"><h3>EQ-BIO-01 · Bioquímica Alfa</h3><span class="selo s-ok">Processando</span></div>
+                <div class="corpo fila">
+                  <div class="item-fila"><div class="linha-flex" style="justify-content:space-between"><span><b>AMO-000123</b> · ELE</span><span class="mut">1 min 40 s restantes</span></div><div class="barra-prog" style="--p:72%"><span></span></div></div>
+                  <div class="item-fila"><div class="linha-flex" style="justify-content:space-between"><span><b>AMO-000123</b> · GLI</span><span class="mut">4 min restantes</span></div><div class="barra-prog" style="--p:35%"><span></span></div></div>
+                  <div class="item-fila"><div class="linha-flex" style="justify-content:space-between"><span><b>AMO-000118</b> · COL</span><span class="selo s-neutro">Na fila</span></div></div>
+                </div></div>
+              <div class="painel"><div class="cab"><h3>Monitor do protocolo</h3><span class="selo s-teal">ASTM</span></div>
+                <div class="corpo"><div class="prot" id="prot" aria-label="Quadros trocados com o equipamento"></div></div></div>
+            </div>
+            <div class="painel"><div class="cab"><h3>Resultado · PED-000045</h3><span class="selo s-perigo">1 valor crítico</span></div>
+              <div class="corpo pilha">
+                <div class="alerta critico"><span aria-hidden="true">!!</span><div><b>Valor crítico:</b> potássio 7,1 mmol/L, acima de 6,5. Confirme antes de validar.</div></div>
+                <div class="rolagem"><table>
+                  <thead><tr><th>Analito</th><th class="num-t">Valor</th><th>Unid.</th><th>Referência</th><th>Flag</th><th>Anterior</th></tr></thead>
+                  <tbody>
+                    <tr><td>Sódio</td><td class="num-t">138</td><td>mmol/L</td><td>135 – 145</td><td><span class="flag f-n">N</span></td><td class="mut">140</td></tr>
+                    <tr><td>Potássio</td><td class="num-t"><b>7,1</b></td><td>mmol/L</td><td>3,5 – 5,1</td><td><span class="flag f-c">C ▲▲</span></td><td class="mut">4,4</td></tr>
+                    <tr><td>Glicose</td><td class="num-t">108</td><td>mg/dL</td><td>70 – 99</td><td><span class="flag f-a">H ▲</span></td><td class="mut">101</td></tr>
+                    <tr><td>Creatinina</td><td class="num-t">1,4</td><td>mg/dL</td><td>0,7 – 1,3</td><td><span class="flag f-a">H ▲</span></td><td class="mut">1,2</td></tr>
+                  </tbody></table></div>
+                <div class="linha-flex"><button class="btn perigo" type="button">Confirmar valor crítico</button><button class="btn" type="button" disabled>Validar</button><button class="btn" type="button" disabled>Liberar laudo</button></div>
+              </div></div>
+          </section>
+
+          <section class="tela" data-painel="tecnico" hidden>
+            <div class="linha-flex" style="justify-content:space-between"><h2>Painel técnico</h2><span class="selo s-neutro">valores de exemplo · commit 3f9c1ab</span></div>
+            <div class="numeros">
+              <div class="numero"><span class="rotulo">Testes C#</span><b>1.284</b><span class="selo s-ok">todos passam</span></div>
+              <div class="numero"><span class="rotulo">Testes JS</span><b>412</b><span class="selo s-ok">todos passam</span></div>
+              <div class="numero"><span class="rotulo">Cobertura</span><b>100%</b><span class="mut" style="font-size:13px">linhas e ramos</span></div>
+              <div class="numero"><span class="rotulo">Regras com teste</span><b>45/45</b><span class="mut" style="font-size:13px">RN-001 a RN-062</span></div>
+              <div class="numero"><span class="rotulo">Licenças</span><b>MIT</b><span class="mut" style="font-size:13px">1 exceção registrada</span></div>
+            </div>
+            <div class="duas">
+              <div class="painel"><div class="cab"><h3>Rodar testes</h3><div class="linha-flex"><button class="btn primario" type="button" id="rodar">Rodar testes JS</button></div></div>
+                <div class="corpo pilha"><div class="console" id="console" aria-live="polite"><span class="tm">Pronto. Prévia visual: nenhum teste roda de verdade aqui.</span></div></div></div>
+              <div class="painel"><div class="cab"><h3>Cobertura por projeto</h3><span class="mut" style="font-size:13px">C#: medida no build</span></div>
+                <div class="corpo cobertura" id="cobertura"></div></div>
+            </div>
+            <div class="duas">
+              <div class="painel"><div class="cab"><h3>Arquitetura</h3><span class="mut" style="font-size:13px">lida dos assemblies</span></div>
+                <div class="corpo camadas">
+                  <div class="camada"><span>Bancada.Web</span><span>Controllers · Views · JS</span></div>
+                  <div class="camada seta">↓ depende de</div>
+                  <div class="camada"><span>Bancada.Aplicacao</span><span>casos de uso · portas</span></div>
+                  <div class="camada seta">↓ depende de</div>
+                  <div class="camada"><span>Bancada.Dominio</span><span>regras · estados</span></div>
+                </div></div>
+              <div class="painel"><div class="cab"><h3>Mapa de segurança (Security+)</h3></div>
+                <div class="rolagem"><table>
+                  <thead><tr><th>Controle</th><th>Domínio</th><th>Teste</th></tr></thead>
+                  <tbody>
+                    <tr><td>Consulta parametrizada</td><td>D2</td><td><span class="selo s-ok">passa</span></td></tr>
+                    <tr><td>CSP sem inline</td><td>D2</td><td><span class="selo s-ok">passa</span></td></tr>
+                    <tr><td>Auditoria encadeada</td><td>D1</td><td><span class="selo s-ok">passa</span></td></tr>
+                    <tr><td>Defesa em profundidade</td><td>D3</td><td><span class="selo s-ok">passa</span></td></tr>
+                    <tr><td>Kill switch do executor</td><td>D4</td><td><span class="selo s-ok">passa</span></td></tr>
+                  </tbody></table></div></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="gut">Prévia de design · paleta e telas de exemplo · dados fictícios</div></footer>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const raiz = document.documentElement;
+
+/* tema */
+const botTema = $('#tema');
+const escuro = () => raiz.dataset.theme ? raiz.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+const rotuloTema = () => { botTema.textContent = escuro() ? 'Escuro · trocar para claro' : 'Claro · trocar para escuro'; };
+botTema.addEventListener('click', () => { raiz.dataset.theme = escuro() ? 'light' : 'dark'; rotuloTema(); });
+rotuloTema();
+
+/* abas principais */
+function aba(token) {
+  $$('.aba').forEach(b => {
+    const sel = b.id === 'a-' + token;
+    b.setAttribute('aria-selected', sel);
+    $('#' + b.getAttribute('aria-controls')).hidden = !sel;
+  });
+  try { history.replaceState(null, '', '#' + token); } catch (e) {}
+  scrollTo({ top: 0 });
+}
+$$('.aba').forEach(b => b.addEventListener('click', () => aba(b.id.slice(2))));
+const inicial = location.hash.slice(1);
+if (['paleta', 'portfolio', 'bancada'].includes(inicial)) aba(inicial);
+
+/* paleta: [nome, token, claro, escuro, uso, contraste claro, contraste escuro] */
+const tokens = [
+  ['Fundo', '--fundo', '#f5f6fa', '#0e1219', 'fundo da página', null, null],
+  ['Superfície', '--superficie', '#ffffff', '#141922', 'cartões, tabelas, barras', null, null],
+  ['Superfície 2', '--superficie-2', '#eef0f6', '#1a2030', 'campos, código, zebra', null, null],
+  ['Linha', '--linha', '#dde1ea', '#262e3d', 'bordas e divisores', null, null],
+  ['Texto', '--texto', '#1a2030', '#e4e8f0', 'texto principal', '15,0', '15,3'],
+  ['Texto secundário', '--texto-2', '#596378', '#98a3b8', 'rótulos, apoio', '5,6', '7,4'],
+  ['Acento · índigo', '--acento', '#3a5bc0', '#86a2ec', 'link, botão, foco, aba ativa', '5,7', '7,5'],
+  ['Acento 2 · petróleo', '--acento-2', '#1a7a70', '#5cc1b2', 'código, dados, progresso', '4,8', '8,7'],
+  ['Acento 3 · violeta', '--acento-3', '#6b4fb3', '#b4a0e6', 'front-end, segurança, destaque', '5,7', '8,1'],
+  ['Ok', '--ok', '#277a4c', '#72c492', 'liberado, passou, normal', '4,9', '9,0'],
+  ['Atenção', '--atencao', '#8a5a0a', '#e0b062', 'vencendo, alto, aviso', '5,5', '9,4'],
+  ['Perigo', '--perigo', '#b03a48', '#ee8d98', 'crítico, erro, descarte', '5,5', '8,0'],
+];
+function luz(hex) {
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+  return (r * 299 + g * 587 + b * 114) / 1000 > 140 ? '#1a2030' : '#f5f6fa';
+}
+$('#fichas').innerHTML = tokens.map(t => `
+  <div class="ficha">
+    <div class="amostras"><span style="background:${t[2]};color:${luz(t[2])}">${t[2]}</span><span style="background:${t[3]};color:${luz(t[3])}">${t[3]}</span></div>
+    <div class="info"><b>${t[0]}</b><span class="num">${t[1]}</span><span class="ctr">${t[4]}</span>${t[5] ? `<span class="ctr">contraste ${t[5]}:1 claro · ${t[6]}:1 escuro</span>` : ''}</div>
+  </div>`).join('');
+$('#tokens').innerHTML =
+`<span class="c">/* tokens.css · um arquivo, dois temas */</span>
+<span class="a">:root</span> {
+  <span class="p">--acento</span>:   <span class="v">#3a5bc0</span>;   <span class="c">/* índigo */</span>
+  <span class="p">--acento-2</span>: <span class="v">#1a7a70</span>;   <span class="c">/* petróleo */</span>
+  <span class="p">--acento-3</span>: <span class="v">#6b4fb3</span>;   <span class="c">/* violeta */</span>
+  <span class="p">--ok</span>: <span class="v">#277a4c</span>;  <span class="p">--atencao</span>: <span class="v">#8a5a0a</span>;  <span class="p">--perigo</span>: <span class="v">#b03a48</span>;
+}
+<span class="a">:root[data-theme="dark"]</span> {
+  <span class="p">--acento</span>:   <span class="v">#86a2ec</span>;
+  <span class="p">--acento-2</span>: <span class="v">#5cc1b2</span>;
+  <span class="p">--acento-3</span>: <span class="v">#b4a0e6</span>;
+}`;
+
+/* abas internas do Bancada */
+$$('.menu button').forEach(b => b.addEventListener('click', () => {
+  $$('.menu button').forEach(x => x.setAttribute('aria-selected', x === b));
+  $$('.tela').forEach(t => t.hidden = t.dataset.painel !== b.dataset.tela);
+  $('#rota').textContent = b.dataset.tela === 'tecnico' ? 'painel' : b.dataset.tela;
+}));
+
+/* agenda */
+const dias = ['Seg 02', 'Ter 03', 'Qua 04', 'Qui 05', 'Sex 06'];
+const horas = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30'];
+const estados = { A: ['Agendado', 's-neutro'], C: ['Confirmado', 's-acento'], K: ['Check-in', 's-ok'], T: ['Em atendimento', 's-atencao'], F: ['Concluído', 's-neutro'], X: ['Faltou', 's-perigo'] };
+const marcados = { '0-0': ['PAC-0003', 'F'], '0-2': ['PAC-0021', 'F'], '1-1': ['PAC-0008', 'X'], '1-4': ['PAC-0030', 'C'], '2-1': ['PAC-0005', 'F'], '2-3': ['PAC-0014', 'T'], '2-5': ['PAC-0044', 'K'], '2-6': ['PAC-0017', 'C'], '3-0': ['PAC-0052', 'A'], '3-3': ['PAC-0009', 'C'], '3-7': ['PAC-0026', 'A'], '4-2': ['PAC-0038', 'A'], '4-4': ['PAC-0011', 'C'] };
+$('#agenda').innerHTML = '<thead><tr><th></th>' + dias.map(d => `<th>${d}</th>`).join('') + '</tr></thead><tbody>' +
+  horas.map((h, i) => `<tr><td class="hora">${h}</td>` + dias.map((_, d) => {
+    const m = marcados[d + '-' + i];
+    return m ? `<td><div class="marc"><b class="mono">${m[0]}</b><span class="selo ${estados[m[1]][1]}">${estados[m[1]][0]}</span></div></td>` : '<td class="livre">livre</td>';
+  }).join('') + '</tr>').join('') + '</tbody>';
+$('#leg-agenda').innerHTML = Object.values(estados).map(e => `<span class="selo ${e[1]}">${e[0]}</span>`).join('');
+
+/* soroteca */
+const mapa = $('#mapa');
+const linhasR = 'ABCDEFGHI';
+const vencendo = new Set(['2-3', '4-6', '6-1', '7-7']);
+const vencida = new Set(['3-4', '8-2']);
+for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {
+  const k = r + '-' + c;
+  const ocupada = ((r * 5 + c * 3) % 7) < 3 || vencendo.has(k) || vencida.has(k);
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'pos' + (ocupada ? (vencida.has(k) ? ' vc' : vencendo.has(k) ? ' vd' : ' oc') : '');
+  b.dataset.r = r; b.dataset.c = c; b.dataset.o = ocupada ? (vencida.has(k) ? 'vencida' : vencendo.has(k) ? 'vencendo' : 'ok') : '';
+  b.setAttribute('aria-pressed', 'false');
+  b.setAttribute('aria-label', `Posição ${linhasR[r]}${c + 1}, ${ocupada ? 'ocupada' : 'livre'}`);
+  b.textContent = ocupada ? '●' : '';
+  mapa.appendChild(b);
+}
+function detalhe(b) {
+  const pos = linhasR[b.dataset.r] + (+b.dataset.c + 1);
+  const o = b.dataset.o;
+  const cod = 'AMO-' + String(100 + b.dataset.r * 9 + +b.dataset.c).padStart(6, '0');
+  $('#detalhe-pos').innerHTML = o
+    ? `<div class="linha-flex" style="justify-content:space-between"><b class="mono">${cod}</b><span class="selo ${o === 'vencida' ? 's-perigo' : o === 'vencendo' ? 's-atencao' : 's-ok'}">${o === 'vencida' ? 'Vencida' : o === 'vencendo' ? 'Vence em 1 dia' : 'Dentro da validade'}</span></div>
+       <div class="rolagem"><table><tbody><tr><td class="mut">Posição</td><td>Rack 1 · Caixa A · ${pos}</td></tr><tr><td class="mut">Material</td><td>Soro</td></tr><tr><td class="mut">Paciente</td><td class="mono">PAC-00${String(10 + +b.dataset.c).padStart(2, '0')}</td></tr><tr><td class="mut">Validade</td><td>7 dias após a coleta</td></tr></tbody></table></div>
+       <p class="mut" style="font-size:13px">Cadeia de custódia: coletada, recebida, armazenada, guardada em ${pos}.</p>
+       <div class="linha-flex"><button class="btn" type="button">Mover</button><button class="btn perigo" type="button">Descartar</button></div>`
+    : `<p><b>Posição ${pos}</b> livre.</p><p class="mut" style="font-size:13px">Uma posição guarda no máximo uma amostra. O banco também impede duplicidade.</p><button class="btn primario" type="button" style="justify-self:start">Armazenar amostra aqui</button>`;
+}
+mapa.addEventListener('click', e => {
+  const b = e.target.closest('.pos'); if (!b) return;
+  $$('.pos', mapa).forEach(x => x.setAttribute('aria-pressed', x === b));
+  detalhe(b);
+});
+detalhe($('.pos.vd', mapa));
+$('.pos.vd', mapa).setAttribute('aria-pressed', 'true');
+
+/* protocolo ASTM com checksum real: soma de FN..ETX módulo 256 */
+const STX = '\x02', ETX = '\x03';
+const quadro = (n, texto) => {
+  const corpo = n + texto + ETX;
+  const soma = [...corpo].reduce((s, ch) => s + ch.charCodeAt(0), 0) % 256;
+  return { corpo, ck: soma.toString(16).toUpperCase().padStart(2, '0') };
+};
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const mostrar = (n, texto) => {
+  const q = quadro(n, texto);
+  return '<span class="tm">‹STX›</span>' + esc(q.corpo.slice(0, 1)) + '<span class="reg">' + esc(q.corpo.slice(1, 2)) + '</span>' + esc(q.corpo.slice(2, -1)) + '<span class="tm">‹ETX›</span><span class="ck">' + q.ck + '</span><span class="tm">‹CR›‹LF›</span>';
+};
+const msgs = [
+  ['↑', '12:00:00', 'ENQ'], ['↓', '12:00:00', 'ACK'],
+  ['↑', '12:00:01', mostrar('1', 'H|\\^&|||Bancada^1.0|||||||P|1|20261104120001')],
+  ['↓', '12:00:01', 'ACK'],
+  ['↑', '12:00:01', mostrar('2', 'P|1||PAC-0014||||19740312|M')],
+  ['↓', '12:00:01', 'ACK'],
+  ['↑', '12:00:02', mostrar('3', 'O|1|AMO-000123||^^^ELE|R')],
+  ['↓', '12:00:02', 'ACK'],
+  ['↑', '12:00:02', mostrar('4', 'L|1|N')],
+  ['↓', '12:00:02', 'ACK'], ['↑', '12:00:02', 'EOT'],
+];
+$('#prot').innerHTML = msgs.map(m => `<span class="tm">${m[1]}</span> <span class="${m[0] === '↑' ? 'cima' : 'baixo'}">${m[0]}</span> ${m[2]}`).join('\n');
+
+/* cobertura */
+const projetos = ['Bancada.Dominio', 'Bancada.Protocolos', 'Bancada.Aplicacao', 'Bancada.Infraestrutura', 'Bancada.Web', 'JavaScript'];
+$('#cobertura').innerHTML = projetos.map(p => `<div class="cob"><span class="mono">${p}</span><div class="trilho"><span style="--p:100%"></span></div><span class="pc">100%</span></div>`).join('');
+
+/* simulação do botão de testes */
+const saida = $('#console');
+const rodar = $('#rodar');
+rodar.addEventListener('click', () => {
+  rodar.disabled = true; saida.textContent = '';
+  const linhas = [
+    ['pr', '$ node --test --experimental-test-coverage tests/js'],
+    ['ok', '✔ agenda › montarGrade › semana com lacunas'],
+    ['ok', '✔ agenda › teclado › setas movem o foco'],
+    ['ok', '✔ soroteca › mapa › posição ocupada não aceita segunda amostra'],
+    ['ok', '✔ etiqueta › code128 › ida e volta de AMO-000123'],
+    ['ok', '✔ qualidade › westgard › regra 2-2s violada'],
+    ['ok', '✔ comum › dom › proíbe innerHTML'],
+    ['tm', 'testes 412 · aprovados 412 · falhas 0 · 0,9 s'],
+    ['tm', 'cobertura  linhas 100%  ramos 100%  funções 100%'],
+    ['tm', '(exemplo visual: nenhum teste foi executado)'],
+  ];
+  let i = 0;
+  const passo = () => {
+    if (i >= linhas.length) { rodar.disabled = false; return; }
+    const s = document.createElement('div'); s.className = linhas[i][0]; s.textContent = linhas[i][1];
+    saida.appendChild(s); saida.scrollTop = saida.scrollHeight; i++;
+    setTimeout(passo, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 260);
+  };
+  passo();
+});
+</script>

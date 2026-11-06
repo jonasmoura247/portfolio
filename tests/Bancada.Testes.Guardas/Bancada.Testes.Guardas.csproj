@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="NUnit.Analyzers" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Bancada.Dominio\Bancada.Dominio.csproj" />
+    <ProjectReference Include="..\..\src\Bancada.Protocolos\Bancada.Protocolos.csproj" />
+    <ProjectReference Include="..\..\src\Bancada.Aplicacao\Bancada.Aplicacao.csproj" />
+    <ProjectReference Include="..\..\src\Bancada.Infraestrutura\Bancada.Infraestrutura.csproj" />
+    <ProjectReference Include="..\..\src\Bancada.Web\Bancada.Web.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="NUnit.Framework" />
+  </ItemGroup>
+</Project>

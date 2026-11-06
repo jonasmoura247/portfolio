@@ -1,0 +1,110 @@
+@model VisaoDaSoroteca
+@{
+    var s = Model.Selecionada;
+    var porLinha = Model.Celulas.GroupBy(c => c.Posicao.Linha).OrderBy(g => g.Key);
+    var livres = Model.Celulas.Where(c => c.Amostra is null).ToList();
+    string Classe(CelulaDaSoroteca c) => c.Vencida ? "pos vc" : c.Vencendo ? "pos vd" : c.Amostra is not null ? "pos oc" : "pos";
+}
+<div class="linha-flex entre">
+  <div><p class="dev">@T["menu.soroteca"]</p><h1>@T["soroteca.titulo"] @Model.Caixa</h1></div>
+  <form method="get" action="/soroteca"><select class="sel" name="caixa" data-auto-enviar aria-label="@T["soroteca.caixa"]">
+    @foreach (var c in Model.Caixas)
+    {
+      <option value="@c" selected="@(c == Model.Caixa)">@c</option>
+    }
+  </select></form>
+</div>
+<div class="duas">
+  <section class="painel">
+    <div class="cab"><h3>@T["soroteca.mapa"]</h3></div>
+    <div class="corpo pilha">
+      <div class="mapa" role="grid" aria-label="@T["soroteca.mapa"]">
+        @foreach (var linha in porLinha)
+        {
+          <span class="ei">@linha.Key</span>
+          foreach (var c in linha)
+          {
+            <a class="@Classe(c)" href="/soroteca?caixa=@Model.Caixa&posicao=@c.Posicao.Id" aria-pressed="@(s?.Posicao.Id == c.Posicao.Id ? "true" : "false")" title="@c.Posicao.Nome @c.Amostra?.Etiqueta" aria-label="@c.Posicao.Nome @c.Amostra?.Etiqueta">@c.Posicao.Coluna</a>
+          }
+        }
+      </div>
+      <div class="legenda"><span><i class="oc"></i>@T["soroteca.ocupada"]</span><span><i class="vd"></i>@T["soroteca.vencendo"]</span><span><i class="vc"></i>@T["soroteca.vencida"]</span></div>
+    </div>
+  </section>
+  <section class="painel">
+    <div class="cab"><h3>@T["soroteca.posicao"]</h3></div>
+    <div class="corpo pilha">
+      @if (s is null)
+      {
+        <p class="mut">@T["soroteca.escolha"]</p>
+      }
+      else if (s.Amostra is null)
+      {
+        <p class="mono">@s.Posicao.Nome</p>
+        @if (Model.Aguardando.Count == 0)
+        {
+          <p class="mut">@T["soroteca.nadaAguardando"]</p>
+        }
+        else
+        {
+          <form class="campos" method="post" action="/soroteca/armazenar" asp-antiforgery="true">
+            <input type="hidden" name="posicao" value="@s.Posicao.Id"><input type="hidden" name="caixa" value="@Model.Caixa">
+            <label>@T["soroteca.amostra"]<select class="sel" name="amostra">
+              @foreach (var a in Model.Aguardando)
+              {
+                <option value="@a.Id">@a.Etiqueta</option>
+              }
+            </select></label>
+            <button class="btn primario linha-inicio" type="submit">@T["soroteca.armazenar"]</button>
+          </form>
+        }
+      }
+      else
+      {
+        <p><b class="mono">@s.Amostra.Etiqueta</b> <span class="selo @Apresentacao.Selo(s.Amostra.Estado)">@T["estado." + s.Amostra.Estado]</span></p>
+        <p class="mut">@s.Posicao.Nome · @s.Paciente!.Codigo · @T["soroteca.validade"] @s.Amostra.ValidadeAte.ToString("dd/MM HH:mm")</p>
+        <form class="linha-flex" method="post" action="/soroteca/mover" asp-antiforgery="true">
+          <input type="hidden" name="origem" value="@s.Posicao.Id"><input type="hidden" name="caixa" value="@Model.Caixa">
+          <select class="sel" name="destino" aria-label="@T["soroteca.destino"]">
+            @foreach (var l in livres)
+            {
+              <option value="@l.Posicao.Id">@l.Posicao.Nome</option>
+            }
+          </select>
+          <button class="btn" type="submit">@T["soroteca.mover"]</button>
+        </form>
+        @if (Context.Pode(Acao.DescartarAmostra))
+        {
+          <form class="linha-flex" method="post" action="/soroteca/descartar" asp-antiforgery="true">
+            <input type="hidden" name="amostra" value="@s.Amostra.Id"><input type="hidden" name="caixa" value="@Model.Caixa">
+            <input class="campo" name="motivo" maxlength="200" required placeholder="@T["soroteca.motivo"]" aria-label="@T["soroteca.motivo"]">
+            <button class="btn perigo" type="submit">@T["soroteca.descartar"]</button>
+          </form>
+        }
+        <h2>@T["soroteca.custodia"]</h2>
+        <ul class="tempo">
+          @foreach (var c in s.Custodia)
+          {
+            <li><time>@c.Quando.ToString("dd/MM HH:mm")</time><span>@T["custodia." + c.Evento] · @c.Local · <span class="mono">@c.OperadorId</span></span></li>
+          }
+        </ul>
+      }
+    </div>
+  </section>
+</div>
+@if (Model.Aguardando.Count > 0)
+{
+  <section class="painel">
+    <div class="cab"><h3>@T["soroteca.aguardando"]</h3></div>
+    <div class="corpo linha-flex">
+      @foreach (var a in Model.Aguardando)
+      {
+        <span class="chip t">@a.Etiqueta</span>
+        @if (a.Hemolisada)
+        {
+          <form class="linha-flex" method="post" action="/amostras/@a.Id/rejeitar" asp-antiforgery="true"><input type="hidden" name="motivo" value="Hemolise"><button class="btn peq perigo" type="submit">@T["soroteca.rejeitarHemolise"]</button></form>
+        }
+      }
+    </div>
+  </section>
+}

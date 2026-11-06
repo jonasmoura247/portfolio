@@ -1,0 +1,111 @@
+@model ProntuarioVm
+@{
+    var v = Model.Visao;
+    var p = v.Paciente;
+    var veEvolucoes = Context.Pode(Acao.VerEvolucoes);
+}
+<div class="linha-flex entre">
+  <div><p class="dev">@T["menu.prontuario"]</p><h1>@p.Nome</h1></div>
+  <form method="get" data-ir-para="/prontuario/" class="linha-flex">
+    <select class="sel" name="paciente" data-ir aria-label="@T["comum.paciente"]">
+      @foreach (var x in Model.Pacientes)
+      {
+        <option value="@x.Id" selected="@(x.Id == p.Id)">@x.Codigo · @x.Nome</option>
+      }
+    </select>
+  </form>
+</div>
+@if (!veEvolucoes)
+{
+  <div class="alerta info"><span aria-hidden="true">ⓘ</span><div>@T["prontuario.soAlergias"]</div></div>
+}
+<div class="duas">
+  <section class="painel">
+    <div class="cab"><h3>@T["prontuario.alergias"]</h3><span class="selo s-violeta">@T["prontuario.cifrado"]</span></div>
+    <div class="corpo pilha">
+      @if (v.Alergias.Count == 0)
+      {
+        <p class="mut">@T["alergia.nenhuma"]</p>
+      }
+      else
+      {
+        <div class="rolagem"><table>
+          <tbody>
+            @foreach (var a in v.Alergias)
+            {
+              <tr><td>@a.Alergia.Substancia</td><td>@a.Reacao</td>
+                <td><span class="selo @(a.Alergia.Ativa ? "s-acento" : "s-neutro")">@T[a.Alergia.Ativa ? "prontuario.ativa" : "prontuario.inativa"]</span></td>
+                <td><form method="post" action="/prontuario/alergia/@a.Alergia.Id/alternar" asp-antiforgery="true"><input type="hidden" name="paciente" value="@p.Id"><button class="btn peq" type="submit">@T[a.Alergia.Ativa ? "prontuario.inativar" : "prontuario.reativar"]</button></form></td></tr>
+            }
+          </tbody>
+        </table></div>
+      }
+      <form class="campos" method="post" action="/prontuario/@p.Id/alergia" asp-antiforgery="true">
+        <label>@T["prontuario.substancia"]<input class="campo" name="substancia" maxlength="60" required></label>
+        <label>@T["prontuario.reacao"]<input class="campo" name="reacao" maxlength="120"></label>
+        <button class="btn linha-inicio" type="submit">@T["prontuario.adicionar"]</button>
+      </form>
+    </div>
+  </section>
+  @if (veEvolucoes)
+  {
+    <section class="painel">
+      <div class="cab"><h3>@T["prontuario.exames"]</h3></div>
+      <div class="corpo">
+        @if (v.Pedidos.Count == 0)
+        {
+          <p class="mut">@T["prontuario.semPedidos"]</p>
+        }
+        else
+        {
+          <div class="rolagem"><table><tbody>
+            @foreach (var x in v.Pedidos)
+            {
+              <tr><td class="mono"><a href="/pedidos/@x.Id">@x.Codigo</a></td><td>@string.Join(", ", x.Itens.Select(i => i.Exame))</td><td><span class="selo @Apresentacao.Selo(x.Estado)">@T["estado." + x.Estado]</span></td></tr>
+            }
+          </tbody></table></div>
+        }
+      </div>
+    </section>
+  }
+</div>
+@if (veEvolucoes)
+{
+  <section class="painel">
+    <div class="cab"><h3>@T["prontuario.evolucoes"]</h3><span class="mut pequeno">@T["prontuario.imutaveis"]</span></div>
+    <div class="corpo pilha">
+      @if (v.Evolucoes.Count == 0)
+      {
+        <p class="mut">@T["prontuario.semEvolucoes"]</p>
+      }
+      @foreach (var e in v.Evolucoes)
+      {
+        <div class="evolucao @(e.FoiCorrigida ? "corrigida" : null)">
+          <span class="rotulo">@e.Evolucao.CriadaEm.ToString("dd/MM/yyyy HH:mm") · @e.Evolucao.AutorId
+            @if (e.Evolucao.CorrigeId is not null)
+            {
+              <span class="s-violeta">· @T["prontuario.correcaoDe"] #@e.Evolucao.CorrigeId</span>
+            }
+            @if (e.FoiCorrigida)
+            {
+              <span>· @T["prontuario.corrigida"]</span>
+            }
+          </span>
+          <p>@e.Texto</p>
+          @if (Model.Corrigindo == e.Evolucao.Id && Context.Pode(Acao.CorrigirEvolucao))
+          {
+            <form class="campos" method="post" action="/prontuario/evolucao/@e.Evolucao.Id/corrigir" asp-antiforgery="true">
+              <input type="hidden" name="paciente" value="@p.Id">
+              <textarea class="campo" name="texto" maxlength="2000" required data-contar aria-label="@T["prontuario.corrigir"]"></textarea>
+              <button class="btn primario peq linha-inicio" type="submit">@T["prontuario.registrarCorrecao"]</button>
+            </form>
+          }
+          else if (!e.FoiCorrigida && Context.Pode(Acao.CorrigirEvolucao))
+          {
+            <div><a class="btn peq" href="/prontuario/@p.Id?corrigir=@e.Evolucao.Id">@T["prontuario.corrigir"]</a></div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+}

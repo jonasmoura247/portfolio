@@ -1,0 +1,32 @@
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+
+[*.{json,yml,yaml,csproj,props,html,css,js,mjs}]
+indent_size = 2
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped:warning
+dotnet_style_qualification_for_field = false:suggestion
+csharp_style_var_for_built_in_types = true:suggestion
+dotnet_sort_system_directives_first = true
+# Nomes em português (convenção do projeto)
+dotnet_diagnostic.CA1710.severity = none
+
+# Nomes de teste seguem Metodo_Cenario_Resultado (convenção do projeto)
+[tests/**.cs]
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1515.severity = none
+
+# Testes: matrizes literais são legíveis; o ganho do CA1861 não vale nos testes
+[tests/**.cs]
+dotnet_diagnostic.CA1861.severity = none
+dotnet_diagnostic.CA1812.severity = none
+dotnet_diagnostic.CA2007.severity = none
+
+[src/Bancada.Infraestrutura/Dados/Migrations/*.cs]
+generated_code = true

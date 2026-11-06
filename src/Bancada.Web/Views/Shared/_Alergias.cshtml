@@ -1,0 +1,10 @@
+@model IReadOnlyList<AlergiaLegivel>
+@{ var ativas = Model.Where(a => a.Alergia.Ativa).ToList(); }
+@if (ativas.Count == 0)
+{
+  <p class="mut">@T["alergia.nenhuma"]</p>
+}
+else
+{
+  <div class="alerta critico"><span aria-hidden="true">!</span><div><b>@T["alergia.ativas"]:</b> @string.Join(", ", ativas.Select(a => a.Alergia.Substancia))</div></div>
+}

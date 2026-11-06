@@ -1,0 +1,7 @@
+@model (string Dev, string Titulo, string? Sub)
+<div><p class="dev">@T[Model.Dev]</p><h1>@T[Model.Titulo]</h1>
+  @if (Model.Sub is not null)
+  {
+    <p class="sub">@T[Model.Sub]</p>
+  }
+</div>

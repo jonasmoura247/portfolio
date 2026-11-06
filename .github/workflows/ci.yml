@@ -1,0 +1,34 @@
+# Escrito na Fase 0; só roda quando o repositório for ao GitHub (decisão do Jonas: Git no final).
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_NOLOGO: 1
+      DOTNET_CLI_UICULTURE: en-US
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Restauração travada
+        run: dotnet restore Bancada.sln --locked-mode
+      - name: Formatação
+        run: dotnet format Bancada.sln --verify-no-changes --no-restore
+      - name: Build (avisos como erro)
+        run: dotnet build Bancada.sln -c Release --no-restore
+      - name: Testes C# (100% de linhas e ramos, arquitetura e licenças)
+        run: dotnet test Bancada.sln -c Release --no-build
+      - name: Testes JS (100%)
+        run: npm run test:js
+      - name: Pacotes vulneráveis
+        run: |
+          dotnet list Bancada.sln package --vulnerable --include-transitive 2>&1 | tee vuln.txt
+          ! grep -q "has the following vulnerable packages" vuln.txt

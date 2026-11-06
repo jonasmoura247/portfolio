@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\Bancada.Aplicacao\Bancada.Aplicacao.csproj" />
+    <ProjectReference Include="..\Bancada.Infraestrutura\Bancada.Infraestrutura.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Recursos/textos.json" />
+    <EmbeddedResource Include="..\Bancada.Dominio\Regras.cs;..\Bancada.Dominio\CadeiaDeAuditoria.cs;..\Bancada.Dominio\MatrizDeAutorizacao.cs;..\Bancada.Dominio\Laboratorio.cs;..\Bancada.Protocolos\Astm.cs;..\Bancada.Protocolos\Analise.cs;..\Bancada.Infraestrutura\CifraAesGcm.cs;CabecalhosDeSeguranca.cs;SessaoMiddleware.cs" LogicalName="codigo/%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Bancada.Testes.Web" />
+  </ItemGroup>
+</Project>

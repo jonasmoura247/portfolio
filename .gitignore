@@ -1,0 +1,12 @@
+bin/
+obj/
+TestResults/
+coverage/
+*.user
+.vs/
+node_modules/
+tools/e2e/capturas/
+coverage/
+src/Bancada.Web/painel-instantaneo.json
+.playwright-mcp/
+*.log

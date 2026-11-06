@@ -1,0 +1,19 @@
+@model LinhaDoPedido
+@{ var p = Model.Pedido; }
+<partial name="_Titulo" model='("menu.pedido", "pedido.detalhe", (string?)null)' />
+<section class="painel destaque">
+  <div class="cab"><h3>@p.Codigo</h3><span class="selo @Apresentacao.Selo(p.Estado)">@T["estado." + p.Estado]</span></div>
+  <div class="corpo pilha">
+    <p class="mut">@Model.Paciente.Codigo · @Model.Paciente.Nome · @p.CriadoEm.ToString("dd/MM HH:mm") · @p.SolicitanteId</p>
+    <div class="trio">
+      @foreach (var t in p.Tubos())
+      {
+        <div class="tubo"><b>@T["material." + t.Material]</b><span class="mono">@string.Join(" + ", t.Exames)</span><span class="mut pequeno">@T["pedido.jejum"]: @t.JejumHoras h · @t.VolumeMl mL</span></div>
+      }
+    </div>
+    @if (p.Estado == EstadoPedido.Solicitado && Context.Pode(Acao.CancelarPedido))
+    {
+      <form method="post" action="/pedidos/@p.Id/cancelar" asp-antiforgery="true"><button class="btn perigo" type="submit">@T["pedido.cancelar"]</button></form>
+    }
+  </div>
+</section>

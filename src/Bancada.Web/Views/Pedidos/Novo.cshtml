@@ -1,0 +1,33 @@
+@model NovoPedidoVm
+<partial name="_Titulo" model='("menu.pedido", "pedido.novo", (string?)null)' />
+@if (Model.Alergias.Count > 0)
+{
+  <div class="alerta critico"><span aria-hidden="true">!</span><div><b>@T["alergia.ativas"]:</b> @string.Join(", ", Model.Alergias.Select(a => a.Substancia))</div></div>
+}
+<form method="post" action="/pedidos/novo" class="duas" data-carrinho asp-antiforgery="true">
+  <input type="hidden" name="atendimento" value="@Model.Agendamento">
+  <section class="painel">
+    <div class="cab"><h3>@T["pedido.catalogo"]</h3>
+      <select class="sel" name="paciente" aria-label="@T["comum.paciente"]" data-ir-pedido>
+        @foreach (var p in Model.Pacientes)
+        {
+          <option value="@p.Codigo" selected="@(p.Id == Model.Paciente.Id)">@p.Codigo · @p.Nome</option>
+        }
+      </select>
+    </div>
+    <div class="corpo catalogo">
+      @foreach (var e in Catalogo.Exames)
+      {
+        <label><input type="checkbox" name="exames" value="@e.Codigo" data-material="@T["material." + e.Material]" data-jejum="@e.JejumHoras"><span>@T["exame." + e.Codigo]</span><span class="chip">@e.Codigo</span></label>
+      }
+    </div>
+  </section>
+  <section class="painel">
+    <div class="cab"><h3>@T["pedido.tubos"]</h3></div>
+    <div class="corpo pilha">
+      <div class="pilha" data-tubos data-vazio="@T["pedido.nenhum"]" data-jejum-rotulo="@T["pedido.jejum"]"><p class="mut">@T["pedido.nenhum"]</p></div>
+      <label class="linha"><input type="checkbox" name="urgente" value="true"> @T["pedido.urgente"]</label>
+      <button class="btn primario linha-inicio" type="submit">@T["pedido.enviar"]</button>
+    </div>
+  </section>
+</form>

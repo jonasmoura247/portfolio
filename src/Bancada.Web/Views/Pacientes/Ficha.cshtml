@@ -1,0 +1,62 @@
+@model FichaDoPaciente
+@{
+    var papel = Context.Sessao().Papel;
+    var veClinico = papel != Papel.Recepcao && papel != Papel.Analista;
+}
+<partial name="_Titulo" model='("menu.pacientes", "pacientes.ficha", (string?)null)' />
+<div class="duas">
+  <section class="painel destaque">
+    <div class="cab"><h3>@Model.Paciente.Nome <span class="mono mut">@Model.Paciente.Codigo</span></h3></div>
+    <div class="corpo pilha">
+      <p class="mut">@T["sexo." + Model.Paciente.Sexo] · @Model.Idade @T["comum.anos"] · @Model.Paciente.Nascimento.ToString("dd/MM/yyyy")</p>
+      @if (veClinico)
+      {
+        <partial name="_Alergias" model="Model.Alergias" />
+      }
+      else
+      {
+        <p class="mut">@T["pacientes.soCadastral"]</p>
+      }
+      @if (Context.Pode(Acao.EditarAlergias))
+      {
+        <a class="btn linha-inicio" href="/prontuario/@Model.Paciente.Id">@T["pacientes.abrirProntuario"]</a>
+      }
+    </div>
+  </section>
+  <section class="painel">
+    <div class="cab"><h3>@T["pacientes.horarios"]</h3></div>
+    <div class="corpo">
+      @if (Model.Agendamentos.Count == 0)
+      {
+        <p class="mut">@T["pacientes.semHorarios"]</p>
+      }
+      else
+      {
+        <ul class="tempo">
+          @foreach (var a in Model.Agendamentos.TakeLast(8))
+          {
+            <li><time>@a.Horario.Inicio.ToString("dd/MM HH:mm")</time><span>@a.Horario.ProfissionalId <span class="selo @Apresentacao.Selo(a.Agendamento.Estado)">@T["estado." + a.Agendamento.Estado]</span></span></li>
+          }
+        </ul>
+      }
+    </div>
+  </section>
+</div>
+<section class="painel">
+  <div class="cab"><h3>@T["pacientes.linhaDoTempo"]</h3></div>
+  <div class="corpo">
+    @if (Model.LinhaDoTempo.Count == 0)
+    {
+      <p class="mut">@T["pacientes.semEventos"]</p>
+    }
+    else
+    {
+      <ul class="tempo">
+        @foreach (var e in Model.LinhaDoTempo)
+        {
+          <li><time>#@e.Seq</time><span class="mono">@e.Acao · @e.Operador</span></li>
+        }
+      </ul>
+    }
+  </div>
+</section>

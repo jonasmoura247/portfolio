@@ -1,0 +1,66 @@
+@model ColetasVm
+<partial name="_Titulo" model='("menu.coleta", "coleta.titulo", (string?)"coleta.sub")' />
+<section class="painel">
+  <div class="cab"><h3>@T["coleta.pendentes"]</h3></div>
+  @if (Model.Pendentes.Count == 0)
+  {
+    <p class="mut vazio">@T["coleta.vazia"]</p>
+  }
+  else
+  {
+    <div class="rolagem"><table>
+      <thead><tr><th>@T["coleta.pedido"]</th><th>@T["comum.paciente"]</th><th>@T["coleta.tubo"]</th><th>@T["coleta.exigido"]</th><th>@T["coleta.registrar"]</th></tr></thead>
+      <tbody>
+        @foreach (var l in Model.Pendentes)
+        {
+          var cenario = l.Pedido.Codigo == Cenarios.PedidoDoCenario;
+          <tr>
+            <td class="mono">@l.Pedido.Codigo</td><td>@l.Paciente.Codigo · @l.Paciente.Nome</td>
+            <td>@T["material." + l.Tubo.Material] <span class="mono mut">@string.Join("+", l.Tubo.Exames)</span></td>
+            <td class="mono">@l.Tubo.JejumHoras h · @l.Tubo.VolumeMl mL</td>
+            <td>
+              <form class="linha-flex" method="post" action="/coletas/@l.Pedido.Id/coletar" asp-antiforgery="true">
+                <input type="hidden" name="material" value="@l.Tubo.Material">
+                <input class="campo curto" type="number" name="jejum" min="0" max="72" value="@l.Tubo.JejumHoras" required aria-label="@T["coleta.jejum"]">
+                <input class="campo curto" type="number" name="volume" min="0.1" step="0.1" value="@l.Tubo.VolumeMl.ToString(System.Globalization.CultureInfo.InvariantCulture)" required aria-label="@T["coleta.volume"]">
+                <label class="linha"><input type="checkbox" name="hemolisada" value="true" checked="@(cenario && Model.SugereHemolise)"> @T["coleta.hemolisada"]</label>
+                <button class="btn peq primario" type="submit">@T["coleta.coletar"]</button>
+              </form>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table></div>
+  }
+</section>
+<section class="painel">
+  <div class="cab"><h3>@T["coleta.amostras"]</h3></div>
+  <div class="rolagem"><table>
+    <thead><tr><th>@T["coleta.etiqueta"]</th><th>@T["comum.paciente"]</th><th>@T["coleta.tubo"]</th><th>@T["comum.estado"]</th><th></th></tr></thead>
+    <tbody>
+      @foreach (var a in Model.Amostras.Where(x => x.Amostra.Estado == EstadoAmostra.Coletada).Reverse())
+      {
+        <tr class="clicavel" data-href="/amostras/@a.Amostra.Id/etiqueta"><td class="mono"><a href="/amostras/@a.Amostra.Id/etiqueta">@a.Amostra.Etiqueta</a></td><td>@a.Paciente.Codigo</td><td>@T["material." + a.Amostra.Material]</td>
+          <td><span class="selo @Apresentacao.Selo(a.Amostra.Estado)">@T["estado." + a.Amostra.Estado]</span>
+            @if (a.Amostra.Hemolisada)
+            {
+              <span class="selo s-perigo">@T["coleta.hemolisada"]</span>
+            }
+          </td>
+          <td>
+            <div class="linha-flex">
+            <a class="btn peq" href="/amostras/@a.Amostra.Id/etiqueta">@T["coleta.verEtiqueta"]</a>
+            <form class="linha-flex" method="post" action="/amostras/@a.Amostra.Id/rejeitar" asp-antiforgery="true">
+              <select class="sel" name="motivo" aria-label="@T["coleta.motivo"]">
+                @foreach (var m in ServicoDeColeta.MotivosDeRejeicao)
+                {
+                  <option value="@m">@T["rejeicao." + m]</option>
+                }
+              </select>
+              <button class="btn peq perigo" type="submit">@T["coleta.rejeitar"]</button>
+            </form>
+          </td></tr>
+      }
+    </tbody>
+  </table></div>
+</section>

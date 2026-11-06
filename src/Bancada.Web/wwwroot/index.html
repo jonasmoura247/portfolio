@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jonas Cavalcante — Dev .NET</title>
+<link rel="stylesheet" href="/portfolio/portfolio.css">
+</head>
+<body>
+<header class="topo">
+  <div class="gut barra">
+    <div class="marca"><span class="monograma" aria-hidden="true">JC</span><span>Jonas Cavalcante<small>~/dev-net</small></span></div>
+    <button class="btn" id="tema" type="button" aria-label="Alternar tema claro e escuro">Tema</button>
+  </div>
+  <div class="gut">
+    <div class="abas" role="tablist" aria-label="Seções do portfólio">
+      <button class="aba" role="tab" id="t-cv" aria-controls="p-cv" aria-selected="true">Currículo</button>
+      <button class="aba" role="tab" id="t-perfil" aria-controls="p-perfil" aria-selected="false">Perfil</button>
+      <button class="aba" role="tab" id="t-exp" aria-controls="p-exp" aria-selected="false">Experiência</button>
+      <button class="aba" role="tab" id="t-proj" aria-controls="p-proj" aria-selected="false">Projetos</button>
+      <button class="aba" role="tab" id="t-stack" aria-controls="p-stack" aria-selected="false">Stack</button>
+      <button class="aba" role="tab" id="t-contato" aria-controls="p-contato" aria-selected="false">Contato</button>
+    </div>
+  </div>
+</header>
+
+<main class="gut">
+
+  <section class="pagina" id="p-cv" role="tabpanel" aria-labelledby="t-cv">
+    <div class="heroi">
+      <div class="linha"><span class="ponto" aria-hidden="true"></span><span>aberto a vagas · .NET pleno · CLT · remoto ou híbrido em Maringá</span></div>
+      <h1>Jonas Emanuel <em>Moura Cavalcante</em></h1>
+      <p class="dev">// Desenvolvedor .NET · C# · ASP.NET MVC · SQL Server · Oracle</p>
+      <p class="meta">Maringá, PR · jonas.moura.cavalcante@hotmail.com · linkedin.com/in/jonas-emanuel-moura · github.com/jonasmoura247</p>
+      <div class="acoes">
+        <a class="btn primario" href="/bancada">Abrir o Bancada (sistema de laboratório) →</a>
+        <button class="btn" type="button" data-ir="t-perfil">Ver o portfólio completo →</button>
+        <button class="btn" type="button" data-ir="t-proj">Projetos</button>
+        <button class="btn" type="button" data-ir="t-contato">Contato</button>
+      </div>
+    </div>
+
+    <div class="item">
+      <h3>Resumo</h3>
+      <p>Desenvolvedor .NET com experiência em sistemas de saúde de missão crítica. Atuo no ERP de saúde da Moderna Sistemas (Grupo Benner), usado por centenas de instituições, em prontuário eletrônico, agenda, faturamento TISS/NFS-e, financeiro e CRM. Experiência prévia em integração de equipamentos médicos com Java e PostgreSQL. Uso IA no desenvolvimento (Claude Code, skills próprias e servidores MCP) para acelerar reprodução, testes e documentação. Aprendo rápido tecnologias novas. Aberto a oportunidades como desenvolvedor .NET pleno.</p>
+    </div>
+
+    <div class="item">
+      <h3>Experiência</h3>
+      <div class="cv-linha sep-p"><b>Desenvolvedor .NET</b><span class="meta">fev/2025 – atual</span></div>
+      <p class="meta">Moderna Sistemas (Grupo Benner) · Maringá, PR (híbrido)</p>
+      <ul>
+        <li>Entregas e correções em prontuário eletrônico, agenda, faturamento, financeiro e CRM de um ERP de saúde usado por centenas de instituições.</li>
+        <li>Integração bancária de pagamentos, com geração de lote, remessa e processamento de retorno.</li>
+        <li>Integração com prescrição digital e correções no faturamento TISS e na emissão de NFS-e, incluindo casamento de guias em notas com várias linhas.</li>
+        <li>Paginação de grids e carregamento sob demanda das atividades no CRM, para reduzir a carga das telas.</li>
+        <li>Scripts de banco versionados com DbUp, compatíveis com SQL Server e Oracle, e testes automatizados.</li>
+        <li>Correção de problemas em produção de ponta a ponta: reprodução, causa raiz, correção, teste antes e depois e documentação para o QA.</li>
+      </ul>
+      <p class="meta">Stack: C#, ASP.NET MVC, Entity Framework, SQL Server, Oracle, JavaScript, Azure DevOps</p>
+
+      <div class="cv-linha sep"><b>Desenvolvedor Java</b><span class="meta">fev/2023 – jan/2025</span></div>
+      <p class="meta">C4 Sistemas · Maringá, PR</p>
+      <ul>
+        <li>Integração de equipamentos médicos aos sistemas internos, ligando software e hardware.</li>
+        <li>Implementação de protocolos de comunicação por rede e por porta serial.</li>
+        <li>Construção e manutenção de APIs; consultas SQL, administração e otimização de banco PostgreSQL.</li>
+      </ul>
+      <p class="meta">Stack: Java, SQL, PostgreSQL, APIs REST</p>
+
+      <div class="cv-linha sep"><b>Suporte técnico</b><span class="meta">mai/2021 – fev/2023</span></div>
+      <p class="meta">Mecânica Avançada · Maringá, PR</p>
+    </div>
+
+    <div class="item">
+      <h3>Projetos próprios</h3>
+      <ul>
+        <li><b>Konta</b> (Flutter, Android): app de controle financeiro offline, publicado na Google Play. Sem cadastro, dados só no aparelho.</li>
+        <li><b>Fluxo de trabalho com IA:</b> skills próprias no Claude Code e servidores MCP para reproduzir bugs, testar antes e depois e documentar correções; vaults de documentação em Markdown pensados para agentes.</li>
+      </ul>
+    </div>
+
+    <div class="item">
+      <h3>Competências</h3>
+      <ul>
+        <li><b>Back-end:</b> C#, .NET, ASP.NET MVC, Entity Framework, APIs REST, Java</li>
+        <li><b>Dados:</b> SQL Server, Oracle, PostgreSQL, DbUp</li>
+        <li><b>Front-end:</b> JavaScript, HTML, CSS</li>
+        <li><b>Práticas:</b> testes unitários, Clean Code, Git, Azure DevOps, integrações, TISS</li>
+        <li><b>IA:</b> Claude Code, skills e subagentes, servidores MCP, engenharia de prompts, automação com agentes</li>
+      </ul>
+    </div>
+
+    <div class="item">
+      <h3>Formação</h3>
+      <p class="meta">UniCesumar · 2019 – 2021</p>
+      <ul><li>Tecnólogo em Análise e Desenvolvimento de Sistemas.</li></ul>
+    </div>
+  </section>
+
+  <section class="pagina" id="p-perfil" role="tabpanel" aria-labelledby="t-perfil" hidden>
+    <div class="heroi">
+      <div class="linha"><span class="ponto" aria-hidden="true"></span><span>aberto a vagas · .NET pleno · CLT · remoto ou híbrido em Maringá</span></div>
+      <h1>Jonas Emanuel <em>Moura Cavalcante</em></h1>
+      <p class="dev">// C# · ASP.NET MVC · Entity Framework · SQL Server · Oracle</p>
+      <p class="lede">Trabalho no ERP de saúde da Moderna Sistemas (Grupo Benner), usado por centenas de instituições, em prontuário eletrônico, agenda, faturamento TISS/NFS-e, financeiro e CRM. Antes disso passei dois anos integrando equipamentos médicos em Java e PostgreSQL, ligando software a hardware por rede e porta serial.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><small>.NET / C#</small><b>2</b><span>anos em produção</span></div>
+      <div class="stat"><small>Java</small><b>2</b><span>anos, integrações</span></div>
+      <div class="stat"><small>SQL</small><b>4</b><span>anos, na C4 e na Benner · SQL Server · Oracle · Postgres</span></div>
+    </div>
+
+    <div class="nota">
+      <h3>// como eu trabalho</h3>
+      <ul>
+        <li>Chamado de produção de ponta a ponta: reprodução, causa raiz, correção, teste antes e depois, documentação para o QA.</li>
+        <li>Banco versionado com <b>DbUp</b>, scripts compatíveis com SQL Server e Oracle, e testes automatizados junto da entrega.</li>
+        <li>IA como ferramenta de trabalho: skills próprias no Claude Code e servidores MCP que eu mesmo escrevi para revisar código, acelerar reprodução de bugs e documentar correções.</li>
+      </ul>
+    </div>
+
+    <div class="item">
+      <h3>Formação</h3>
+      <p class="meta">UniCesumar · 2019 – 2021</p>
+      <ul><li>Tecnólogo em Análise e Desenvolvimento de Sistemas.</li></ul>
+    </div>
+  </section>
+
+  <section class="pagina" id="p-exp" role="tabpanel" aria-labelledby="t-exp" hidden>
+    <div class="cabeca">
+      <p class="dev">// linha do tempo</p>
+      <h2 class="titulo">Experiência profissional</h2>
+      <p class="sub">Cinco anos e meio em tecnologia, os últimos quatro escrevendo software para o setor de saúde.</p>
+    </div>
+
+    <div class="item exp">
+      <h3>Desenvolvedor .NET — Moderna Sistemas (Grupo Benner)</h3>
+      <p class="meta">fev/2025 – atual · Maringá, PR · híbrido</p>
+      <ul>
+        <li>Entregas e correções em <b>prontuário eletrônico, agenda, faturamento, financeiro e CRM</b> de um ERP de saúde usado por centenas de instituições.</li>
+        <li>Integração bancária de pagamentos: geração de lote, remessa e processamento de retorno.</li>
+        <li>Integração com prescrição digital e correções no <b>faturamento TISS</b> e na emissão de <b>NFS-e</b>, incluindo casamento de guias em notas com várias linhas.</li>
+        <li>Paginação de grids e carregamento sob demanda das atividades no CRM, reduzindo a carga das telas.</li>
+        <li>Scripts de banco versionados com DbUp para SQL Server e Oracle, com testes automatizados.</li>
+      </ul>
+      <div class="chips">
+        <span class="chip a">C#</span><span class="chip a">ASP.NET MVC</span><span class="chip a">Entity Framework</span><span class="chip t">SQL Server</span><span class="chip t">Oracle</span><span class="chip v">JavaScript</span><span class="chip">Azure DevOps</span>
+      </div>
+    </div>
+
+    <div class="item exp">
+      <h3>Desenvolvedor Java — C4 Sistemas</h3>
+      <p class="meta">fev/2023 – jan/2025 · Maringá, PR</p>
+      <ul>
+        <li>Integração de <b>equipamentos médicos</b> aos sistemas internos, ligando software e hardware.</li>
+        <li>Implementação de protocolos de comunicação por rede e por <b>porta serial</b>.</li>
+        <li>Construção e manutenção de APIs REST; consultas SQL, administração e otimização de banco PostgreSQL.</li>
+      </ul>
+      <div class="chips"><span class="chip a">Java</span><span class="chip t">SQL</span><span class="chip t">PostgreSQL</span><span class="chip">APIs REST</span><span class="chip">Protocolos seriais</span></div>
+    </div>
+
+    <div class="item exp">
+      <h3>Suporte técnico — Mecânica Avançada</h3>
+      <p class="meta">mai/2021 – fev/2023 · Maringá, PR</p>
+      <ul><li>Atendimento técnico e resolução de problemas com usuários — onde aprendi a investigar antes de mexer.</li></ul>
+    </div>
+  </section>
+
+  <section class="pagina" id="p-proj" role="tabpanel" aria-labelledby="t-proj" hidden>
+    <div class="cabeca">
+      <p class="dev">// fora do horário</p>
+      <h2 class="titulo">Projetos próprios</h2>
+      <p class="sub">O que eu construo por conta, fora do trabalho.</p>
+    </div>
+
+    <div class="item destaque">
+      <h3>Konta — controle financeiro offline</h3>
+      <p class="meta">Flutter · Android · publicado na Google Play · v1.3.0</p>
+      <ul>
+        <li>App de finanças pessoais e familiares <b>100% offline</b>: nenhum dado sai do aparelho, sem cadastro.</li>
+        <li>Seis telas: dashboard mensal, lançamentos, calendário de fechamento e pagamento de cartão, histórico anual com insights, reservas e metas, configurações.</li>
+        <li>Arquitetura em camadas com Hive, Riverpod, GoRouter e fl_chart; documentação própria de regras de negócio e usabilidade.</li>
+      </ul>
+      <div class="chips"><span class="chip v">Flutter</span><span class="chip t">Hive</span><span class="chip">Riverpod</span><span class="chip">GoRouter</span><span class="chip">fl_chart</span></div>
+    </div>
+
+    <div class="item">
+      <h3>rpg-mesa — painel de mesa de RPG</h3>
+      <p class="meta">.NET 8 · código aberto</p>
+      <ul>
+        <li>Solução dividida em <b>API, núcleo de domínio e ingestor</b> de conteúdo, com o domínio nomeado em português.</li>
+        <li>Rolagem de dados e gerenciamento de campanhas, com o front servido pela própria API.</li>
+        <li>Dois projetos de teste automatizado, um para o núcleo e um para a API.</li>
+      </ul>
+      <div class="chips"><span class="chip a">C#</span><span class="chip a">.NET 8</span><span class="chip">ASP.NET Core</span><span class="chip">Testes automatizados</span></div>
+      <div class="tools"><a class="btn primario" href="https://github.com/jonasmoura247/rpg-mesa">Ver no GitHub</a></div>
+    </div>
+
+    <div class="item">
+      <h3>IA — servidores MCP próprios</h3>
+      <p class="meta">TypeScript · Model Context Protocol · 4 servidores</p>
+      <ul>
+        <li><b>code-review-mcp:</b> carrega as diretrizes de código do projeto e faz a revisão pré-commit, com anotações na linha do problema, severidade e veredito aprovado/reprovado.</li>
+        <li><b>sonar-review-mcp:</b> mesma revisão, com regras no estilo SonarQube para C#, JavaScript/TypeScript, HTML e CSS.</li>
+        <li><b>pr-comments-mcp:</b> lista os comentários pendentes de um Pull Request do Azure DevOps e responde a cada um, marcando como resolvido.</li>
+        <li><b>pr-replicate-mcp:</b> busca os arquivos de um PR e aplica só as linhas alteradas no clone local, sem sobrescrever em caso de conflito.</li>
+        <li>Nenhum segredo ou caminho no código: token e repositório vêm de variáveis de ambiente.</li>
+      </ul>
+      <div class="chips"><span class="chip v">TypeScript</span><span class="chip">MCP</span><span class="chip">Azure DevOps API</span><span class="chip">Claude Code</span></div>
+    </div>
+  </section>
+
+  <section class="pagina" id="p-stack" role="tabpanel" aria-labelledby="t-stack" hidden>
+    <div class="cabeca">
+      <p class="dev">// competências</p>
+      <h2 class="titulo">Stack e práticas</h2>
+      <p class="sub">O que uso no dia a dia em primeiro lugar; o resto vem de projeto próprio.</p>
+    </div>
+
+    <div class="item">
+      <h3>Back-end</h3>
+      <div class="chips"><span class="chip a">C#</span><span class="chip a">.NET / .NET Core</span><span class="chip a">ASP.NET MVC</span><span class="chip a">Entity Framework</span><span class="chip">APIs REST</span><span class="chip">Java</span></div>
+    </div>
+    <div class="item">
+      <h3>Dados</h3>
+      <div class="chips"><span class="chip t">SQL Server</span><span class="chip t">Oracle</span><span class="chip">PostgreSQL</span><span class="chip">DbUp</span><span class="chip">SQLite</span></div>
+    </div>
+    <div class="item">
+      <h3>Front-end e mobile</h3>
+      <div class="chips"><span class="chip v">JavaScript</span><span class="chip">HTML</span><span class="chip">CSS</span><span class="chip">Flutter</span></div>
+    </div>
+    <div class="item">
+      <h3>Práticas</h3>
+      <div class="chips"><span class="chip">Testes unitários</span><span class="chip">Clean Code</span><span class="chip">Git</span><span class="chip">Azure DevOps</span><span class="chip">Integrações</span><span class="chip">TISS</span><span class="chip">Unity</span></div>
+    </div>
+    <div class="item">
+      <h3>IA no desenvolvimento</h3>
+      <div class="chips"><span class="chip v">Claude Code</span><span class="chip">Skills e subagentes</span><span class="chip">Servidores MCP</span><span class="chip">Engenharia de prompts</span><span class="chip">Automação com agentes</span></div>
+    </div>
+    <div class="item">
+      <h3>Idiomas</h3>
+      <div class="chips"><span class="chip">Português — nativo</span><span class="chip">Inglês — básico</span><span class="chip">Espanhol — básico</span></div>
+    </div>
+  </section>
+
+  <section class="pagina" id="p-contato" role="tabpanel" aria-labelledby="t-contato" hidden>
+    <div class="cabeca">
+      <p class="dev">// vamos conversar</p>
+      <h2 class="titulo">Contato</h2>
+      <p class="sub">Aberto a vagas de desenvolvedor .NET pleno, CLT, remoto ou híbrido em Maringá.</p>
+    </div>
+
+    <div class="item">
+      <div class="row">
+        <div><p class="lbl">e-mail</p><p id="mail">jonas.moura.cavalcante@hotmail.com</p></div>
+        <div><p class="lbl">linkedin</p><p><a href="https://www.linkedin.com/in/jonas-emanuel-moura">linkedin.com/in/jonas-emanuel-moura</a></p></div>
+        <div><p class="lbl">github</p><p><a href="https://github.com/jonasmoura247">github.com/jonasmoura247</a></p></div>
+        <div><p class="lbl">local</p><p>Maringá, Paraná, Brasil</p></div>
+      </div>
+      <div class="tools">
+        <button class="btn primario" id="copy" type="button">Copiar e-mail</button>
+        <a class="btn" href="https://www.linkedin.com/in/jonas-emanuel-moura">Abrir LinkedIn</a>
+        <span class="toast" id="toast" role="status"></span>
+      </div>
+    </div>
+  </section>
+
+  <footer>Portfólio de Jonas Emanuel Moura Cavalcante · desenvolvedor .NET · Maringá, PR</footer>
+</main>
+<script src="/portfolio/portfolio.js"></script>
+</body>
+</html>

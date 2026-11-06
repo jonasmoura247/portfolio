@@ -1,0 +1,74 @@
+@model DetalheDoAtendimento
+@{
+    var a = Model.Linha.Agendamento;
+    var h = Model.Linha.Horario;
+    var p = Model.Linha.Paciente;
+    var meu = h.ProfissionalId == Context.Sessao().Operador;
+    var aberto = a.Estado == EstadoAgendamento.EmAtendimento;
+}
+<partial name="_Titulo" model='("menu.atendimento", "atendimento.detalhe", (string?)null)' />
+<section class="painel destaque">
+  <div class="cab"><h3>@p.Nome <span class="mono mut">@p.Codigo</span></h3><span class="selo @Apresentacao.Selo(a.Estado)">@T["estado." + a.Estado]</span></div>
+  <div class="corpo pilha">
+    <p class="mut">@T["sexo." + p.Sexo] · @Model.Idade @T["comum.anos"] · @h.Inicio.ToString("dd/MM HH:mm") · @h.ProfissionalId</p>
+    <partial name="_Alergias" model="Model.Alergias" />
+    @if (!meu)
+    {
+      <div class="alerta info"><span aria-hidden="true">ⓘ</span><div>@T["atendimento.erro.outroprofissional"]</div></div>
+    }
+    <div class="duas">
+      <div class="pilha">
+        <h2>@T["atendimento.recente"]</h2>
+        @foreach (var e in Model.Recentes)
+        {
+          <div class="evolucao"><span class="rotulo">@e.Evolucao.CriadaEm.ToString("dd/MM/yyyy HH:mm") · @e.Evolucao.AutorId</span><p>@e.Texto</p></div>
+        }
+        @if (Model.Recentes.Count == 0)
+        {
+          <p class="mut">@T["atendimento.semRegistros"]</p>
+        }
+      </div>
+      <div class="pilha">
+        <h2>@T["atendimento.novaEvolucao"]</h2>
+        @if (aberto && Context.Pode(Acao.RegistrarEvolucao))
+        {
+          <form class="campos" method="post" action="/atendimentos/@a.Id/evolucao" asp-antiforgery="true">
+            <textarea class="campo" name="texto" maxlength="2000" required data-contar aria-label="@T["atendimento.novaEvolucao"]"></textarea>
+            <button class="btn primario linha-inicio" type="submit">@T["atendimento.registrar"]</button>
+          </form>
+        }
+        else
+        {
+          <p class="mut">@T["atendimento.semEscrita"]</p>
+        }
+      </div>
+    </div>
+    @if (Model.Deste.Count > 0)
+    {
+      <h2>@T["atendimento.deste"]</h2>
+      foreach (var e in Model.Deste)
+      {
+        <div class="evolucao"><span class="rotulo">@e.Evolucao.CriadaEm.ToString("dd/MM HH:mm") · @e.Evolucao.AutorId · @T["atendimento.cifrada"]</span><p>@e.Texto</p></div>
+      }
+    }
+    @if (Model.Pedidos.Count > 0)
+    {
+      <div class="linha-flex">
+        @foreach (var x in Model.Pedidos)
+        {
+          <a class="chip a" href="/pedidos/@x.Id">@x.Codigo</a>
+        }
+      </div>
+    }
+    @if (aberto)
+    {
+      <div class="linha-flex">
+        @if (Context.Pode(Acao.CriarPedido))
+        {
+          <a class="btn" href="/pedidos/novo?paciente=@p.Codigo&atendimento=@a.Id">@T["atendimento.pedirExame"]</a>
+        }
+        <form method="post" action="/atendimentos/@a.Id/concluir" asp-antiforgery="true"><button class="btn primario" type="submit">@T["atendimento.concluir"]</button></form>
+      </div>
+    }
+  </div>
+</section>

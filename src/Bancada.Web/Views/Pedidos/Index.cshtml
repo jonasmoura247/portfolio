@@ -1,0 +1,24 @@
+@model IReadOnlyList<LinhaDoPedido>
+<div class="linha-flex entre">
+  <div><p class="dev">@T["menu.pedido"]</p><h1>@T["pedido.titulo"]</h1></div>
+  @if (Context.Pode(Acao.CriarPedido))
+  {
+    <a class="btn primario" href="/pedidos/novo">@T["pedido.novo"]</a>
+  }
+</div>
+<section class="painel"><div class="rolagem"><table>
+  <thead><tr><th>@T["comum.codigo"]</th><th>@T["comum.paciente"]</th><th>@T["pedido.exames"]</th><th>@T["comum.estado"]</th><th></th></tr></thead>
+  <tbody>
+    @foreach (var l in Model.Take(40))
+    {
+      <tr class="clicavel" data-href="/pedidos/@l.Pedido.Id"><td class="mono"><a href="/pedidos/@l.Pedido.Id">@l.Pedido.Codigo</a></td><td>@l.Paciente.Codigo · @l.Paciente.Nome</td><td>@string.Join(", ", l.Pedido.Itens.Select(i => i.Exame))</td>
+        <td><span class="selo @Apresentacao.Selo(l.Pedido.Estado)">@T["estado." + l.Pedido.Estado]</span></td>
+        <td>
+          @if (l.Pedido.Urgente)
+          {
+            <span class="selo s-perigo">@T["pedido.urgente"]</span>
+          }
+        </td></tr>
+    }
+  </tbody>
+</table></div></section>

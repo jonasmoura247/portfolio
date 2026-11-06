@@ -1,0 +1,15 @@
+@model VisaoDaQualidade
+<partial name="_Titulo" model='("menu.qualidade", "qualidade.titulo", (string?)"qualidade.sub")' />
+@if (Model.Reprovado)
+{
+  <div class="alerta critico"><span aria-hidden="true">!</span><div><b>@string.Join(", ", Model.Regras):</b> @T["resultado.erro.cq"]</div></div>
+}
+else
+{
+  <div class="alerta ok"><span aria-hidden="true">✓</span><div>@T["qualidade.aprovado"]</div></div>
+}
+<figure class="fig sem-margem">
+  <div class="figt"><h3>@ServicoDeQualidade.Equipamento · @ServicoDeQualidade.Analito</h3><span>@T["qualidade.grafico"]</span></div>
+  @Graficos.LeveyJennings(Model.Serie.Select(c => c.Z).ToList(), Model.Media, Model.Desvio, T["qualidade.grafico"])
+</figure>
+<form method="post" action="/qualidade/medicao" asp-antiforgery="true"><button class="btn primario" type="submit">@T["qualidade.registrar"]</button></form>
