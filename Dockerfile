@@ -1,6 +1,6 @@
 # Imagem do Bancada. Fase 2 troca a imagem final para incluir o executor de testes (Node e binário de testes).
 # Imagens base fixadas por digest (a tag pode mudar de conteúdo; o digest não). O Dependabot propõe a atualização.
-FROM mcr.microsoft.com/dotnet/sdk:9.0@sha256:07ed28d9e7279248fcea27334880f6c415b42c631c39b8bc5b3caf13ec6fdaa2 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0@sha256:212fe4cb74627d5adf9817a4088906ae3edff1bd853bb27565d4b46731efe61e AS build
 WORKDIR /src
 COPY . .
 RUN dotnet restore Bancada.sln --locked-mode \
