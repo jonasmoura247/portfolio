@@ -4,6 +4,7 @@ import { ligarCarrinho } from './carrinho.js';
 import { ligarExecutor, ligarVivo } from './vivo.js';
 import { ligarLinhaClicavel } from './linhas.js';
 import { ligarModal } from './modal.js';
+import { ligarAjuda } from './ajuda.js';
 
 function ligarContador(doc, campo) {
   const contador = doc.createElement('span');
@@ -45,6 +46,9 @@ export function iniciar(doc, janela) {
   }
   for (const el of doc.querySelectorAll('[data-href]')) {
     ligarLinhaClicavel(janela, el);
+  }
+  for (const botao of doc.querySelectorAll('[data-abrir-ajuda]')) {
+    ligarAjuda(botao, doc.querySelector('[data-ajuda]'));
   }
   for (const dialogo of doc.querySelectorAll('[data-modal]')) {
     ligarModal(janela, dialogo);

@@ -2,6 +2,7 @@
     var sessao = Context.Sessao();
     var aviso = sessao.Aviso;
     sessao.Aviso = null;
+    var ajuda = Modulos.IdDaRota(Context.Request.Path);
 }
 <!doctype html>
 <html lang="@sessao.Idioma">
@@ -48,6 +49,7 @@
           </label>
         </form>
         <span class="sessao" title="@T["topo.sessao"]">@T["topo.sessao"] @sessao.Id[..8]…</span>
+        <button class="btn ajuda" type="button" data-abrir-ajuda aria-haspopup="dialog">@T["ajuda.botao"]</button>
         <a class="btn" href="/">@T["topo.portfolio"]</a>
         <button class="btn" type="button" data-alternar-tema>@T["topo.tema"]</button>
         <form method="post" asp-controller="Sessao" asp-action="Reiniciar">
@@ -72,6 +74,25 @@
       @RenderBody()
     </main>
   </div>
+  <dialog class="modal ajuda-modal" data-ajuda aria-labelledby="ajuda-titulo">
+    <header><h2 id="ajuda-titulo">@T["ajuda.titulo"] · @T["menu." + ajuda]</h2><button class="btn peq" type="button" data-fechar aria-label="@T["comum.fechar"]">✕</button></header>
+    <div class="corpo pilha">
+      <p>@T["ajuda." + ajuda + ".resumo"]</p>
+      <div>
+        <h3>@T["ajuda.comoFazer"]</h3>
+        <ol class="passos-ajuda">
+          @foreach (var passo in T["ajuda." + ajuda + ".passos"].Split('|'))
+          {
+            <li>@passo</li>
+          }
+        </ol>
+      </div>
+      <figure class="video-ajuda">
+        <video controls muted loop playsinline preload="none" src="/videos/@(ajuda).mp4" aria-label="@T["ajuda.videoRotulo"]"></video>
+        <figcaption class="mut pequeno">@T["ajuda.videoRotulo"]</figcaption>
+      </figure>
+    </div>
+  </dialog>
   <script type="module" src="~/js/app.js" asp-append-version="true"></script>
 </body>
 </html>

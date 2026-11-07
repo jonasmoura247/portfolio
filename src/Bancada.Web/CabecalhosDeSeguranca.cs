@@ -12,7 +12,7 @@ public sealed class CabecalhosDeSeguranca(RequestDelegate proximo)
     public static readonly (string Nome, string Valor)[] Padrao =
     [
         ("Content-Security-Policy",
-            "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; " +
+            "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self'; " +
             "connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; object-src 'none'"),
         ("Strict-Transport-Security", "max-age=31536000; includeSubDomains"),
         ("X-Content-Type-Options", "nosniff"),

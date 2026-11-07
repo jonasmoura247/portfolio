@@ -22,6 +22,24 @@ public sealed class Modulo
 
 public static class Modulos
 {
+    /// <summary>Telas que o menu não lista (detalhes e ações) e o módulo de ajuda que as explica.</summary>
+    private static readonly Dictionary<string, string> Parentes = new() { ["/amostras"] = "etiquetas", ["/laudos"] = "resultados", ["/execucoes"] = "equipamento" };
+
+    /// <summary>Qual módulo (e portanto qual ajuda) responde por este caminho. Fora de qualquer módulo, vale o início.</summary>
+    public static string IdDaRota(string caminho)
+    {
+        var modulo = Todos.FirstOrDefault(m => m.Id != "inicio" && Casa(caminho, m.Rota));
+        if (modulo is not null)
+        {
+            return modulo.Id;
+        }
+
+        var parente = Parentes.FirstOrDefault(p => Casa(caminho, p.Key));
+        return parente.Value ?? "inicio";
+    }
+
+    private static bool Casa(string caminho, string rota) => caminho == rota || caminho.StartsWith(rota + "/", System.StringComparison.Ordinal);
+
     public static IReadOnlyList<Modulo> Todos { get; } =
     [
         new() { Id = "inicio", Rota = "/bancada", Fase = 1, Acoes = [] },

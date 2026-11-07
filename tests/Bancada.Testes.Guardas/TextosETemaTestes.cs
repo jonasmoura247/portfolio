@@ -13,7 +13,7 @@ namespace Bancada.Testes.Guardas;
 public partial class TextosETemaTestes
 {
     private static readonly string[] CodigosDeErro = ["400", "403", "404", "429", "500"];
-    private static readonly string[] PrefixosDinamicos = ["menu.", "papel.", "erro.", "estado.", "dia.", "sexo.", "material.", "exame.", "rejeicao.", "custodia.", "cenario.", "roteiro.", "executor.", "fluxo.", "auditoria.grupo.", "painel.aba."];
+    private static readonly string[] PrefixosDinamicos = ["menu.", "ajuda.", "papel.", "erro.", "estado.", "dia.", "sexo.", "material.", "exame.", "rejeicao.", "custodia.", "cenario.", "roteiro.", "executor.", "fluxo.", "auditoria.grupo.", "painel.aba."];
 
     private static IEnumerable<string> Views() => Repositorio.Arquivos(Path.Combine("src", "Bancada.Web", "Views"), "*.cshtml");
 
