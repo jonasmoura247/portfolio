@@ -1,21 +1,32 @@
-# Escrito na Fase 0; só roda quando o repositório for ao GitHub (decisão do Jonas: Git no final).
+# Mesmos passos do tools/verificar. Endurecido (auditoria de segurança SEC-10):
+# token só de leitura, actions fixadas por SHA (tag pode ser movida; commit não), checkout sem guardar credencial.
 name: ci
 on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verificar:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       DOTNET_NOLOGO: 1
       DOTNET_CLI_UICULTURE: en-US
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
           global-json-file: global.json
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
       - name: Restauração travada
@@ -24,7 +35,7 @@ jobs:
         run: dotnet format Bancada.sln --verify-no-changes --no-restore
       - name: Build (avisos como erro)
         run: dotnet build Bancada.sln -c Release --no-restore
-      - name: Testes C# (100% de linhas e ramos, arquitetura e licenças)
+      - name: Testes C# (100% de linhas e ramos, arquitetura, licenças e ataques SEC-xx)
         run: dotnet test Bancada.sln -c Release --no-build
       - name: Testes JS (100%)
         run: npm run test:js

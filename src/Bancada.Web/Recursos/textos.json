@@ -195,6 +195,8 @@
   "erro.400": ["Requisição inválida","Invalid request"],
   "erro.403": ["Acesso negado para o seu papel","Access denied for your role"],
   "erro.404": ["Página não encontrada","Page not found"],
+  "erro.405": ["Método não permitido","Method not allowed"],
+  "erro.413": ["Conteúdo grande demais","Content too large"],
   "erro.429": ["Muitas requisições. Aguarde um minuto.","Too many requests. Wait a minute."],
   "erro.500": ["Algo deu errado. Nada foi perdido.","Something went wrong. Nothing was lost."],
   "erro.voltar": ["Voltar ao início","Back to home"],

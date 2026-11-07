@@ -52,6 +52,25 @@ public class InfraDaSessaoTestes
     }
 
     [Test]
+    public async Task SEC06_Processo_NaoHerdaVariavelForaDaLista()
+    {
+        Environment.SetEnvironmentVariable("BANCADA_SEGREDO_DE_TESTE", "vazou");
+        var linhas = new List<string>();
+        var comando = new ComandoDeTeste("node", ["-e", "console.log(process.env.BANCADA_SEGREDO_DE_TESTE ?? 'ausente')"], TimeSpan.FromSeconds(30));
+
+        try
+        {
+            await new ProcessosDoSistema(AppContext.BaseDirectory).Rodar(comando, linhas.Add, CancellationToken.None);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("BANCADA_SEGREDO_DE_TESTE", null);
+        }
+
+        Assert.That(linhas, Is.EqualTo(new[] { "ausente" }));
+    }
+
+    [Test]
     public async Task Processo_PassouDoTempo_MataEDevolveNulo()
     {
         using var limite = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));

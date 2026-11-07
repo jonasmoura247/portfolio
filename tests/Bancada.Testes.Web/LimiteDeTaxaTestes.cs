@@ -79,7 +79,7 @@ public class LimiteDeTaxaTestes
     {
         var contexto = new DefaultHttpContext();
 
-        var particao = ConfiguracaoDeTaxa.Particao(contexto, new LimitesDeTaxa());
+        var particao = ConfiguracaoDeTaxa.Particao(contexto, new LimitesDeTaxa(), _ => true);
 
         Assert.That(particao.PartitionKey, Is.EqualTo("s:desconhecido"));
     }
@@ -102,9 +102,31 @@ public class LimiteDeTaxaTestes
 
         var limites = new LimitesDeTaxa();
 
-        Assert.That(ConfiguracaoDeTaxa.Particao(leitura, limites).PartitionKey, Is.EqualTo("r:10.1.2.3"));
-        Assert.That(ConfiguracaoDeTaxa.Particao(head, limites).PartitionKey, Is.EqualTo("r:10.1.2.3"));
-        Assert.That(ConfiguracaoDeTaxa.Particao(escrita, limites).PartitionKey, Is.EqualTo("w:10.1.2.3"));
+        Assert.That(ConfiguracaoDeTaxa.Particao(leitura, limites, _ => true).PartitionKey, Is.EqualTo("r:10.1.2.3"));
+        Assert.That(ConfiguracaoDeTaxa.Particao(head, limites, _ => true).PartitionKey, Is.EqualTo("r:10.1.2.3"));
+        Assert.That(ConfiguracaoDeTaxa.Particao(escrita, limites, _ => true).PartitionKey, Is.EqualTo("w:10.1.2.3"));
+    }
+
+    [Test]
+    public void SEC02_Particao_CookieDeSessaoQueNaoExiste_VaiProBaldeDeNovaSessao()
+    {
+        var contexto = new DefaultHttpContext();
+        contexto.Request.Headers.Cookie = "__Host-bancada.sid=inventado";
+        contexto.Connection.RemoteIpAddress = IPAddress.Parse("10.1.2.3");
+
+        Assert.That(ConfiguracaoDeTaxa.Particao(contexto, new LimitesDeTaxa(), id => id == "outro").PartitionKey, Is.EqualTo("s:10.1.2.3"));
+    }
+
+    [Test]
+    public void SEC03_Particao_IPv6_ContaPorPrefixo64()
+    {
+        var a = new DefaultHttpContext();
+        a.Connection.RemoteIpAddress = IPAddress.Parse("2001:db8:1:2::1");
+        var b = new DefaultHttpContext();
+        b.Connection.RemoteIpAddress = IPAddress.Parse("2001:db8:1:2:ffff:eeee:dddd:cccc");
+
+        Assert.That(ConfiguracaoDeTaxa.Particao(a, new LimitesDeTaxa(), _ => false).PartitionKey, Is.EqualTo("s:2001:db8:1:2::/64"));
+        Assert.That(ConfiguracaoDeTaxa.Particao(b, new LimitesDeTaxa(), _ => false).PartitionKey, Is.EqualTo("s:2001:db8:1:2::/64"));
     }
 
     [Test]
@@ -115,7 +137,7 @@ public class LimiteDeTaxaTestes
             var contexto = new DefaultHttpContext();
             contexto.Request.Path = caminho;
 
-            Assert.That(ConfiguracaoDeTaxa.Particao(contexto, new LimitesDeTaxa()).PartitionKey, Is.EqualTo("sem-limite"));
+            Assert.That(ConfiguracaoDeTaxa.Particao(contexto, new LimitesDeTaxa(), _ => true).PartitionKey, Is.EqualTo("sem-limite"));
         }
     }
 

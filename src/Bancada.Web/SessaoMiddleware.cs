@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using Bancada.Aplicacao;
 using Bancada.Dominio;
@@ -19,8 +16,6 @@ public sealed class SessaoMiddleware(RequestDelegate proximo, RepositorioDeSesso
     public const string NomeDoCookie = "__Host-bancada.sid";
     public const string ChaveNoContexto = "Bancada.Sessao";
 
-    private static readonly ConditionalWeakTable<Sessao, SemaphoreSlim> Travas = [];
-
     private static readonly CookieOptions Opcoes = new()
     {
         HttpOnly = true,
@@ -34,11 +29,34 @@ public sealed class SessaoMiddleware(RequestDelegate proximo, RepositorioDeSesso
     {
         contexto.Request.Cookies.TryGetValue(NomeDoCookie, out var idRecebido);
         var sessao = repositorio.ObterOuCriar(idRecebido);
-        if (sessao.Eventos.Count == 0)
+        await sessao.Entrar(contexto.RequestAborted);
+
+        // Descartada enquanto esperava a vez (teto de sessões): segue numa sessão nova, como se tivesse expirado.
+        while (sessao.Descartada)
         {
-            auditoria.Registrar(sessao, "SessaoCriada");
+            sessao.Sair();
+            sessao = repositorio.ObterOuCriar(null);
+            await sessao.Entrar(contexto.RequestAborted);
         }
 
+        try
+        {
+            if (sessao.Eventos.Count == 0)
+            {
+                auditoria.Registrar(sessao, "SessaoCriada");
+            }
+
+            auditoria.Descarregar(sessao);
+            await Atender(contexto, sessao, idRecebido);
+        }
+        finally
+        {
+            auditoria.SairDescarregando(sessao);
+        }
+    }
+
+    private Task Atender(HttpContext contexto, Sessao sessao, string? idRecebido)
+    {
         contexto.Items[ChaveNoContexto] = sessao;
         contexto.User = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, sessao.Id)], "Sessao"));
         contexto.Response.OnStarting(() =>
@@ -52,17 +70,8 @@ public sealed class SessaoMiddleware(RequestDelegate proximo, RepositorioDeSesso
             return Task.CompletedTask;
         });
 
-        var trava = Travas.GetValue(sessao, _ => new SemaphoreSlim(1, 1));
-        await trava.WaitAsync(contexto.RequestAborted);
-        try
-        {
-            sessao.Visitados.Add(contexto.Request.Path.Value!);
-            await proximo(contexto);
-        }
-        finally
-        {
-            trava.Release();
-        }
+        sessao.Visitados.Add(contexto.Request.Path.Value!);
+        return proximo(contexto);
     }
 }
 

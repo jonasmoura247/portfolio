@@ -70,7 +70,8 @@ public interface IProcessos
 
 public sealed class LimitesDoExecutor
 {
-    public bool Habilitado { get; init; } = true;
+    /// <summary>Desligado por padrão: ligar é decisão explícita de quem hospeda (ou o ambiente de desenvolvimento).</summary>
+    public bool Habilitado { get; init; }
 
     public int PorIpACada5Minutos { get; init; } = 1;
 

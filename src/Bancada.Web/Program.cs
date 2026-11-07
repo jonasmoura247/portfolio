@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 // Números de formulário sempre com ponto: em servidor pt-BR, "0.5" viraria 5 (ponto de milhar).
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
@@ -30,7 +31,8 @@ construtor.Services.AddSingleton<RepositorioDeSessoes>();
 construtor.Services.AddSingleton<ServicoDeAuditoria>();
 construtor.Services.AddSingleton(new LimitesDeTaxa());
 construtor.Services.AddSingleton<BloqueioDeIp>();
-construtor.Services.AddSingleton(new LimitesDoExecutor { Habilitado = construtor.Configuration.GetValue("Bancada:Executor:Habilitado", true) });
+// O executor cria processos no servidor: fora do ambiente de desenvolvimento, só liga com Bancada:Executor:Habilitado=true.
+construtor.Services.AddSingleton(new LimitesDoExecutor { Habilitado = construtor.Configuration.GetValue("Bancada:Executor:Habilitado", construtor.Environment.IsDevelopment()) });
 construtor.Services.AddSingleton<IProcessos>(_ => new ProcessosDoSistema(Registro.RaizDosTestes(construtor.Configuration["Bancada:Executor:Raiz"], construtor.Environment.ContentRootPath)));
 construtor.Services.AddSingleton<ExecutorDeTestes>();
 Registro.Casos(construtor.Services);
@@ -58,7 +60,14 @@ construtor.Services.AddControllersWithViews(opcoes =>
 construtor.Services.AddRateLimiter(_ => { });
 construtor.Services.AddOptions<RateLimiterOptions>().Configure<LimitesDeTaxa>(ConfiguracaoDeTaxa.Aplicar);
 
+var encaminhados = Registro.CabecalhosEncaminhados(construtor.Configuration["Bancada:ProxiesConfiaveis"]);
+
 var app = construtor.Build();
+if (encaminhados is not null)
+{
+    app.UseForwardedHeaders(encaminhados);
+}
+
 app.UseMiddleware<CabecalhosDeSeguranca>();
 app.UseExceptionHandler("/erro/500");
 app.UseStatusCodePagesWithReExecute("/erro/{0}");

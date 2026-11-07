@@ -40,22 +40,24 @@ public static class ConfiguracaoDeTaxa
 
             return ValueTask.CompletedTask;
         };
-        opcoes.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(contexto => Particao(contexto, limites));
+        opcoes.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(contexto =>
+            Particao(contexto, limites, id => contexto.RequestServices.GetRequiredService<RepositorioDeSessoes>().Encontrar(id) is not null));
     }
 
     /// <summary>
-    /// Sem cookie de sessão: balde "nova sessão" (conter quem cria sessão em massa). Com cookie: leitura ou escrita.
+    /// Sem sessão viva: balde "nova sessão" (conter quem cria sessão em massa). Um cookie inventado conta como sem sessão,
+    /// porque o servidor vai criar uma nova para ele. Com sessão viva: leitura ou escrita.
     /// O health check e as páginas de erro (reexecutadas pelo próprio servidor) ficam fora do limite.
     /// </summary>
-    public static RateLimitPartition<string> Particao(HttpContext contexto, LimitesDeTaxa limites)
+    public static RateLimitPartition<string> Particao(HttpContext contexto, LimitesDeTaxa limites, Func<string, bool> sessaoExiste)
     {
         if (contexto.Request.Path.StartsWithSegments("/saude") || contexto.Request.Path.StartsWithSegments("/erro"))
         {
             return RateLimitPartition.GetNoLimiter("sem-limite");
         }
 
-        var ip = contexto.Connection.RemoteIpAddress?.ToString() ?? "desconhecido";
-        if (!contexto.Request.Cookies.ContainsKey(SessaoMiddleware.NomeDoCookie))
+        var ip = ProtecaoDeEntrada.Ip(contexto);
+        if (!contexto.Request.Cookies.TryGetValue(SessaoMiddleware.NomeDoCookie, out var id) || !sessaoExiste(id))
         {
             return Janela("s:" + ip, limites.NovaSessao, limites.Janela);
         }

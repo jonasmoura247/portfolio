@@ -38,7 +38,7 @@ public static class Hl7
         foreach (var obx in lista.Where(s => s.StartsWith("OBX|", StringComparison.Ordinal)))
         {
             var campos = obx.Split('|');
-            if (campos.Length < 6 || !double.TryParse(campos[5], NumberStyles.Float, CultureInfo.InvariantCulture, out var valor))
+            if (campos.Length < 6 || !double.TryParse(campos[5], NumberStyles.Float, CultureInfo.InvariantCulture, out var valor) || !double.IsFinite(valor))
             {
                 throw new FormatException("Segmento OBX inválido.");
             }

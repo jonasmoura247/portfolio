@@ -4,7 +4,7 @@ Mini LIS de demonstração para o portfólio do Jonas. O plano completo está em
 
 ## Regras fixas
 
-- ASP.NET Core MVC em camadas (Dominio, Protocolos, Aplicacao, Infraestrutura, Web), C#, JavaScript e SQL. **.NET 9** (SDK 9.0.102; migrar para o 10 LTS antes de publicar).
+- ASP.NET Core MVC em camadas (Dominio, Protocolos, Aplicacao, Infraestrutura, Web), C#, JavaScript e SQL. **.NET 9** (SDK 9.0.102). Decisão do Jonas em 07/11/2026: fica no .NET 9, sem migrar para o 10, mesmo após o fim do suporte (10/11/2026).
 - **Tudo MIT, política estrita.** Única exceção: `SQLitePCLRaw` (Apache-2.0). Testes com NUnit e dublês escritos à mão. Sem ZAP, Stryker, xUnit, Moq, FluentAssertions.
 - **100% de cobertura** de linhas e ramos (C# e JS); o build falha abaixo disso. Código novo nasce com teste.
 - Segurança como requisito: ver `vault/04-Seguranca/`. Textos em pt-BR e en, nunca fixos nas Views.

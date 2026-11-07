@@ -23,7 +23,16 @@ public class ExecutorTestes
         }
     }
 
-    private static ExecutorDeTestes Novo(ProcessoFalso processo, RelogioManual relogio, LimitesDoExecutor? limites = null) => new(processo, relogio, limites ?? new LimitesDoExecutor());
+    private static ExecutorDeTestes Novo(ProcessoFalso processo, RelogioManual relogio, LimitesDoExecutor? limites = null) => new(processo, relogio, limites ?? new LimitesDoExecutor { Habilitado = true });
+
+    [Test]
+    public void Executor_PorPadrao_NasceDesligado()
+    {
+        var p = new ProcessoFalso((_, _, _) => Task.FromResult<int?>(0));
+
+        Assert.That(new ExecutorDeTestes(p, new RelogioManual(), new LimitesDoExecutor()).Iniciar("js", "ip"), Is.EqualTo("painel.erro.desligado"));
+        Assert.That(p.Chamadas, Is.Zero);
+    }
 
     [Test]
     public async Task Executor_RodaOComandoConstanteEEntregaASaida()
@@ -83,7 +92,7 @@ public class ExecutorTestes
     public async Task Executor_LimitePorIpEPorHora()
     {
         var relogio = new RelogioManual();
-        var e = Novo(new ProcessoFalso((_, _, _) => Task.FromResult<int?>(0)), relogio, new LimitesDoExecutor { PorHora = 2 });
+        var e = Novo(new ProcessoFalso((_, _, _) => Task.FromResult<int?>(0)), relogio, new LimitesDoExecutor { Habilitado = true, PorHora = 2 });
 
         Assert.That(e.Iniciar("js", "a"), Is.Null);
         await e.EmCurso!;
@@ -109,7 +118,7 @@ public class ExecutorTestes
 
             return Task.FromResult<int?>(0);
         });
-        var e = Novo(p, new RelogioManual(), new LimitesDoExecutor { TamanhoDaSaida = 64 });
+        var e = Novo(p, new RelogioManual(), new LimitesDoExecutor { Habilitado = true, TamanhoDaSaida = 64 });
         e.Iniciar("js", "a");
         await e.EmCurso!;
 

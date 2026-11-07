@@ -29,7 +29,11 @@ $env:Bancada__CookiesSeguros = 'false'; $env:ASPNETCORE_URLS = 'http://localhost
 
 Abra http://localhost:5099. Pelo Visual Studio, o perfil `Bancada.Web` abre em `https://localhost:50799` (HTTPS, com os cookies seguros ligados). `Bancada__CookiesSeguros=false` serve apenas para rodar sem HTTPS na própria máquina; fora disso o padrão é seguro.
 
-Configuração opcional: `Bancada__PapelInicial` (padrão `Admin`) define o papel com que cada visitante começa.
+Configuração opcional:
+
+- `Bancada__PapelInicial` (padrão `Admin`) define o papel com que cada visitante começa.
+- `Bancada__ProxiesConfiaveis` lista os IPs ou redes (CIDR) do proxy reverso da hospedagem, separados por vírgula. Só deles o `X-Forwarded-For` é aceito; sem a lista, o cabeçalho é ignorado. Atrás de proxy, sem essa configuração, todos os visitantes dividiriam o mesmo limite de taxa.
+- `Bancada__Executor__Habilitado` liga o executor de testes do painel técnico. Fora do ambiente de desenvolvimento, ele nasce desligado.
 
 ## Como verificar
 
@@ -48,6 +52,8 @@ ASP.NET Core MVC em camadas, com guardas de teste que impedem dependências na d
 ## Segurança
 
 Tratada como requisito, não como acabamento: CSP sem `unsafe-inline`, cookie `__Host-` com antifalsificação por sessão, limite de taxa e bloqueio por IP, matriz de autorização com negação por padrão, erros genéricos, dados clínicos cifrados em repouso, auditoria encadeada por hash e testes com entradas hostis (SQL injection, XSS, travessia de caminho). O repositório não guarda senhas, tokens nem chaves: a chave de cifra nasce na memória de cada sessão.
+
+A auditoria de segurança (ataques controlados, achados, correções e o que ainda depende da hospedagem) está em [`RELATORIO-AUDITORIA-CYBERSECURITY.md`](RELATORIO-AUDITORIA-CYBERSECURITY.md). Os ataques ficam como testes de regressão (`AtaquesTestes`, `SEC-xx`) e como roteiro caixa-preta em `tools/seguranca/ataques.mjs`.
 
 ## Documentação
 

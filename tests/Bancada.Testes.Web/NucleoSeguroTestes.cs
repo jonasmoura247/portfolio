@@ -275,8 +275,12 @@ public class NucleoSeguroTestes
     [TestCase(403, HttpStatusCode.Forbidden)]
     [TestCase(404, HttpStatusCode.NotFound)]
     [TestCase(429, HttpStatusCode.TooManyRequests)]
+    [TestCase(405, HttpStatusCode.MethodNotAllowed)]
+    [TestCase(413, HttpStatusCode.RequestEntityTooLarge)]
     [TestCase(500, HttpStatusCode.InternalServerError)]
-    [TestCase(418, HttpStatusCode.InternalServerError)]
+    [TestCase(418, HttpStatusCode.BadRequest)]
+    [TestCase(503, HttpStatusCode.InternalServerError)]
+    [TestCase(302, HttpStatusCode.InternalServerError)]
     public async Task PaginaDeErro_CodigoConhecidoOuNao_UsaOStatusCerto(int codigo, HttpStatusCode esperado)
     {
         using var cliente = _app.NovoCliente();

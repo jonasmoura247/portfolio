@@ -216,6 +216,10 @@ public class AstmTestes
 
     [TestCase("R|1")]
     [TestCase("R|1|^^^POT|abc|mmol/L")]
+    [TestCase("R|1|^^^POT|NaN|mmol/L")]
+    [TestCase("R|1|^^^POT|Infinity|mmol/L")]
+    [TestCase("R|1|^^^POT|-Infinity|mmol/L")]
+    [TestCase("R|1|^^^POT|1e999|mmol/L")]
     public void LerResultados_RegistroInvalido_LancaErro(string registro)
     {
         Assert.That(() => Astm.LerResultados([registro]), Throws.TypeOf<FormatException>());
@@ -251,8 +255,74 @@ public class Hl7Testes
 
     [TestCase("OBX|1")]
     [TestCase("OBX|1|NM|POT||abc")]
+    [TestCase("OBX|1|NM|POT||NaN")]
+    [TestCase("OBX|1|NM|POT||Infinity")]
+    [TestCase("OBX|1|NM|POT||1e999")]
     public void LerResultados_ObxInvalido_LancaErro(string obx)
     {
         Assert.That(() => Hl7.LerResultados(["MSH|x|ORU^R01", obx]), Throws.TypeOf<FormatException>());
+    }
+}
+
+/// <summary>
+/// SEC-08: entrada hostil nos leitores de protocolo. Milhares de quadros e mensagens aleatórios ou mutados (semente fixa,
+/// repetível): o único erro aceito é FormatException, nada de IndexOutOfRange, laço sem fim ou valor não finito aceito.
+/// </summary>
+public class ProtocolosHostisTestes
+{
+    private const string Alfabeto = "|^\\&~ RHOPL0123456789.-+eE\x02\x03\x17\r\nNaInfityé\u0000￿";
+
+    private static string Aleatorio(Random r, int maximo) => new([.. Enumerable.Range(0, r.Next(maximo)).Select(_ => Alfabeto[r.Next(Alfabeto.Length)])]);
+
+    private static void SoFormatException(Action ler)
+    {
+        try
+        {
+            ler();
+        }
+        catch (FormatException)
+        {
+        }
+    }
+
+    [Test]
+    public void Astm_QuadrosAleatoriosEMutados_SoRecusaComFormatException()
+    {
+        var r = new Random(20261107);
+        var validos = Astm.Quadros([Astm.Cabecalho("EQ", "20261107"), Astm.Resultado(1, "POT", 4.2, "mmol/L", "N"), Astm.Fim()]);
+        for (var i = 0; i < 5000; i++)
+        {
+            var mutado = validos.Select(q => r.Next(4) == 0 ? q.Insert(r.Next(q.Length), Aleatorio(r, 6)) : q).ToList();
+            var lixo = Enumerable.Range(0, r.Next(1, 4)).Select(_ => Aleatorio(r, 300)).ToList();
+
+            Assert.DoesNotThrow(() => SoFormatException(() => Astm.Registros(mutado)), $"mutado {i}");
+            Assert.DoesNotThrow(() => SoFormatException(() => Astm.Registros(lixo)), $"lixo {i}");
+            Assert.DoesNotThrow(() => SoFormatException(() => Astm.LerResultados(lixo)), $"registros {i}");
+        }
+    }
+
+    [Test]
+    public void Hl7_SegmentosAleatorios_SoRecusaComFormatExceptionENuncaValorNaoFinito()
+    {
+        var r = new Random(20261107);
+        for (var i = 0; i < 5000; i++)
+        {
+            var segmentos = new List<string> { "MSH|^~\\&|EQ|LAB|BANCADA|LAB|1||ORU^R01|MSG1|P|2.5.1" };
+            segmentos.AddRange(Enumerable.Range(0, r.Next(1, 5)).Select(_ => "OBX|" + Aleatorio(r, 80)));
+            IReadOnlyList<(string, double Valor)> lidos = [];
+
+            Assert.DoesNotThrow(() => SoFormatException(() => lidos = Hl7.LerResultados(segmentos)), $"mensagem {i}");
+            Assert.That(lidos.All(x => double.IsFinite(x.Valor)), $"mensagem {i}");
+        }
+    }
+
+    [Test]
+    public void Astm_TransmissaoGrande_RemontaSemCrescerSemLimite()
+    {
+        var registros = Enumerable.Range(1, 2000).Select(i => Astm.Resultado(i, "POT", 4.2, "mmol/L", "N")).ToList();
+
+        var lidos = Astm.LerResultados(Astm.Registros(Astm.Quadros(registros)));
+
+        Assert.That(lidos, Has.Count.EqualTo(2000));
     }
 }

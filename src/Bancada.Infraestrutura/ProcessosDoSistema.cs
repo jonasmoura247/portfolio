@@ -6,9 +6,19 @@ using Bancada.Aplicacao;
 
 namespace Bancada.Infraestrutura;
 
-/// <summary>Cria o processo de verdade: ambiente limpo, diretório fixo, sem shell. Comando e argumentos vêm só de constantes.</summary>
+/// <summary>
+/// Cria o processo de verdade: diretório fixo, sem shell, comando e argumentos só de constantes. O ambiente é limpo de
+/// verdade: só passam as variáveis desta lista (caminhos do sistema e do .NET). Segredo injetado pela hospedagem não chega
+/// ao processo dos testes, nem à saída que o visitante lê.
+/// </summary>
 public sealed class ProcessosDoSistema(string raiz) : IProcessos
 {
+    public static readonly string[] VariaveisPermitidas =
+    [
+        "PATH", "HOME", "USERPROFILE", "TEMP", "TMP", "TMPDIR", "LANG", "SystemRoot", "SystemDrive", "windir", "ProgramFiles", "ProgramFiles(x86)",
+        "ProgramData", "APPDATA", "LOCALAPPDATA", "DOTNET_ROOT", "DOTNET_CLI_HOME", "DOTNET_NOLOGO", "DOTNET_CLI_TELEMETRY_OPTOUT", "NUGET_PACKAGES",
+    ];
+
     public async Task<int?> Rodar(ComandoDeTeste comando, Action<string> aoLer, CancellationToken cancelar)
     {
         ArgumentNullException.ThrowIfNull(comando);
@@ -25,9 +35,13 @@ public sealed class ProcessosDoSistema(string raiz) : IProcessos
             inicio.ArgumentList.Add(argumento);
         }
 
-        foreach (var nome in new[] { "GITHUB_TOKEN", "HTTP_PROXY", "HTTPS_PROXY" })
+        inicio.Environment.Clear();
+        foreach (var nome in VariaveisPermitidas)
         {
-            inicio.Environment.Remove(nome);
+            if (Environment.GetEnvironmentVariable(nome) is { } valor)
+            {
+                inicio.Environment[nome] = valor;
+            }
         }
 
         using var processo = new Process { StartInfo = inicio };

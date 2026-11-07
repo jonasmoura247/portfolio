@@ -123,7 +123,7 @@ public static class Astm
         foreach (var r in registros.Where(x => x.StartsWith("R|", StringComparison.Ordinal)))
         {
             var campos = r.Split('|');
-            if (campos.Length < 4 || !double.TryParse(campos[3], NumberStyles.Float, CultureInfo.InvariantCulture, out var valor))
+            if (campos.Length < 4 || !double.TryParse(campos[3], NumberStyles.Float, CultureInfo.InvariantCulture, out var valor) || !double.IsFinite(valor))
             {
                 throw new FormatException("Registro R inválido.");
             }

@@ -1,0 +1,15 @@
+# Avisos de atualização (auditoria de segurança SEC-10). Cada PR passa pelo CI inteiro antes de entrar.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly

@@ -21,6 +21,32 @@ public class ContainerETestes
     }
 
     [Test]
+    public void SEC10_Ci_TokenSoDeLeituraEActionsFixadasPorCommit()
+    {
+        var ci = Ler(".github", "workflows", "ci.yml");
+        var usos = System.Text.RegularExpressions.Regex.Matches(ci, @"uses:\s*(\S+)");
+
+        Assert.That(ci, Does.Contain("permissions:\n  contents: read").Or.Contain("permissions:\r\n  contents: read"));
+        Assert.That(ci, Does.Contain("persist-credentials: false"));
+        Assert.That(usos, Is.Not.Empty);
+        foreach (System.Text.RegularExpressions.Match uso in usos)
+        {
+            Assert.That(uso.Groups[1].Value, Does.Match("@[0-9a-f]{40}$"), $"action sem SHA: {uso.Groups[1].Value}");
+        }
+    }
+
+    [Test]
+    public void SEC11_ContextoDoDocker_NaoLevaGitNemArtefatosLocais()
+    {
+        var ignorados = Ler(".dockerignore");
+
+        foreach (var item in new[] { ".git/", "**/bin/", "**/obj/", "vault/", "**/painel-instantaneo.json" })
+        {
+            Assert.That(ignorados, Does.Contain(item));
+        }
+    }
+
+    [Test]
     public void Ci_TemOsMesmosPassosDoScriptLocal()
     {
         var ci = Ler(".github", "workflows", "ci.yml");

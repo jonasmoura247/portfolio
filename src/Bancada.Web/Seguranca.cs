@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Bancada.Aplicacao;
 using Bancada.Dominio;
@@ -44,10 +47,24 @@ public sealed class BloqueioDeIp(IRelogio relogio)
 {
     public const int Tolerancia = 5;
 
+    /// <summary>Acima disso, as entradas vencidas são podadas: muitos IPs diferentes não viram memória sem fim.</summary>
+    public const int PodarAcimaDe = 10_000;
+
     private static readonly TimeSpan Janela = TimeSpan.FromMinutes(1);
     private static readonly TimeSpan Duracao = TimeSpan.FromMinutes(10);
 
     private readonly Dictionary<string, (int Vezes, DateTimeOffset Inicio, DateTimeOffset? Ate)> _ips = [];
+
+    public int Quantidade
+    {
+        get
+        {
+            lock (_ips)
+            {
+                return _ips.Count;
+            }
+        }
+    }
 
     public bool Bloqueado(string ip)
     {
@@ -63,6 +80,14 @@ public sealed class BloqueioDeIp(IRelogio relogio)
         lock (_ips)
         {
             var agora = relogio.Agora;
+            if (_ips.Count >= PodarAcimaDe)
+            {
+                foreach (var vencido in _ips.Where(x => agora - x.Value.Inicio >= Janela && !(x.Value.Ate > agora)).Select(x => x.Key).ToList())
+                {
+                    _ips.Remove(vencido);
+                }
+            }
+
             var atual = _ips.TryGetValue(ip, out var e) && agora - e.Inicio < Janela ? e : (0, agora, null);
             var vezes = atual.Item1 + 1;
             var bloqueia = vezes >= Tolerancia;
@@ -95,7 +120,33 @@ public sealed class ProtecaoDeEntrada(RequestDelegate proximo, BloqueioDeIp bloq
         return proximo(contexto);
     }
 
-    public static string Ip(HttpContext contexto) => contexto.Connection.RemoteIpAddress?.ToString() ?? "desconhecido";
+    /// <summary>
+    /// Quem é o cliente para limites e bloqueio. Atrás de proxy, o IP já vem do X-Forwarded-For pelo UseForwardedHeaders
+    /// (só de proxies configurados). IPv6 conta por /64: quem recebe um /64 do provedor tem bilhões de endereços para girar.
+    /// </summary>
+    public static string Ip(HttpContext contexto) => ChaveDoCliente(contexto.Connection.RemoteIpAddress);
+
+    public static string ChaveDoCliente(IPAddress? ip)
+    {
+        if (ip is null)
+        {
+            return "desconhecido";
+        }
+
+        if (ip.IsIPv4MappedToIPv6)
+        {
+            return ip.MapToIPv4().ToString();
+        }
+
+        if (ip.AddressFamily != AddressFamily.InterNetworkV6)
+        {
+            return ip.ToString();
+        }
+
+        var bytes = ip.GetAddressBytes();
+        Array.Clear(bytes, 8, 8);
+        return new IPAddress(bytes).ToString() + "/64";
+    }
 
     /// <summary>Anota na sessão do cookie, se houver. Quem nem tem sessão não gera estado novo.</summary>
     public static void AnotarEvento(HttpContext contexto, RepositorioDeSessoes sessoes, ServicoDeAuditoria auditoria, string evento)
@@ -103,7 +154,7 @@ public sealed class ProtecaoDeEntrada(RequestDelegate proximo, BloqueioDeIp bloq
         contexto.Request.Cookies.TryGetValue(SessaoMiddleware.NomeDoCookie, out var id);
         if (sessoes.Encontrar(id) is { } sessao)
         {
-            auditoria.Registrar(sessao, evento, "Sessao", "-", "{}", "Bloqueado");
+            auditoria.Anotar(sessao, evento);
         }
     }
 }

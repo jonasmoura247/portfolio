@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Bancada.Aplicacao;
 using Bancada.Dominio;
 using Bancada.Web;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,10 +22,25 @@ public sealed class ControladorDeTeste : Controller
 
     public static int MaximoSimultaneo { get; private set; }
 
+    /// <summary>A ação "portao" avisa que chegou e espera este sinal: segura a vez da sessão pelo tempo que o teste quiser.</summary>
+    public static TaskCompletionSource Abrir { get; private set; } = new();
+
+    public static TaskCompletionSource Chegou { get; private set; } = new();
+
     public static void Zerar()
     {
         _emExecucao = 0;
         MaximoSimultaneo = 0;
+        Abrir = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        Chegou = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    }
+
+    [HttpGet("portao")]
+    public async Task<IActionResult> Portao()
+    {
+        Chegou.TrySetResult();
+        await Abrir.Task;
+        return Content("ok");
     }
 
     [HttpGet("protegido"), Autorizar(Acao.DescartarAmostra)]
@@ -48,10 +64,10 @@ internal sealed partial class AppDeTeste : IDisposable
 {
     private readonly WebApplicationFactory<Program> _fabrica;
 
-    public AppDeTeste(LimitesDeTaxa? limites = null, bool cookiesSeguros = true, Action<IServiceCollection>? extra = null, (string Chave, string Valor)? configuracao = null, string? papelInicial = "Recepcao")
+    public AppDeTeste(LimitesDeTaxa? limites = null, bool cookiesSeguros = true, Action<IServiceCollection>? extra = null, (string Chave, string Valor)? configuracao = null, string? papelInicial = "Recepcao", string ambiente = "Development")
     {
         ControladorDeTeste.Zerar();
-        _fabrica = new WebApplicationFactory<Program>().WithWebHostBuilder(construtor => PapelInicial(construtor.UseSetting("Bancada:CookiesSeguros", cookiesSeguros ? "true" : "false"), papelInicial).UseSetting(configuracao?.Chave ?? "Bancada:Instantaneo", configuracao?.Valor ?? "inexistente.json").ConfigureServices(servicos =>
+        _fabrica = new WebApplicationFactory<Program>().WithWebHostBuilder(construtor => PapelInicial(construtor.UseEnvironment(ambiente).UseSetting("Bancada:CookiesSeguros", cookiesSeguros ? "true" : "false"), papelInicial).UseSetting(configuracao?.Chave ?? "Bancada:Instantaneo", configuracao?.Valor ?? "inexistente.json").ConfigureServices(servicos =>
         {
             extra?.Invoke(servicos);
             servicos.AddControllersWithViews().AddApplicationPart(typeof(ControladorDeTeste).Assembly);

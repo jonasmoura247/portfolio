@@ -1,0 +1,16 @@
+# Só o necessário para compilar entra no contexto do build (auditoria de segurança SEC-11).
+**/bin/
+**/obj/
+.git/
+.github/
+.vs/
+.playwright-mcp/
+**/node_modules/
+**/TestResults/
+coverage/
+vault/
+esboco/
+tools/e2e/
+*.log
+*.user
+**/painel-instantaneo.json
