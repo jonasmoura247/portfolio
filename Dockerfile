@@ -7,7 +7,7 @@ RUN dotnet restore Bancada.sln --locked-mode \
  && dotnet publish src/Bancada.Web/Bancada.Web.csproj -c Release -o /app --no-restore
 
 # Chiseled: sem shell e sem gerenciador de pacotes; roda como usuário sem privilégio.
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-noble-chiseled@sha256:9db8b6b5b268ebf419167693b076f66f5d998cc5771ef11f61c0e4eec376631f AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled@sha256:f2557fb81b1cfcfdfcde9d3bf247ed60b2cd38f00a88153f61e34737fab8ade7 AS final
 WORKDIR /app
 COPY --from=build /app .
 # Sem canal de diagnóstico (depurador, dumps): menos superfície e funciona com sistema de arquivos só de leitura.
