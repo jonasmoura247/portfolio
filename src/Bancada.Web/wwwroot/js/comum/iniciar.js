@@ -1,10 +1,11 @@
 /* Liga os comportamentos da página. O DOM e a janela entram por parâmetro, para testar sem navegador. */
-import { alternarTema, restaurarTema } from './tema.js';
+import { alternarTema, comTransicao, restaurarTema } from './tema.js';
 import { ligarCarrinho } from './carrinho.js';
 import { ligarExecutor, ligarVivo } from './vivo.js';
 import { ligarLinhaClicavel } from './linhas.js';
 import { ligarModal } from './modal.js';
 import { ligarAjuda } from './ajuda.js';
+import { manterMenu } from './menu.js';
 
 function ligarContador(doc, campo) {
   const contador = doc.createElement('span');
@@ -21,7 +22,7 @@ export function iniciar(doc, janela) {
     el.addEventListener('change', () => el.form.requestSubmit());
   }
   for (const botao of doc.querySelectorAll('[data-alternar-tema]')) {
-    botao.addEventListener('click', () => alternarTema(doc.documentElement, janela.matchMedia('(prefers-color-scheme: dark)').matches, janela));
+    botao.addEventListener('click', () => comTransicao(doc, () => { alternarTema(doc.documentElement, janela.matchMedia('(prefers-color-scheme: dark)').matches, janela); }));
   }
   for (const botao of doc.querySelectorAll('[data-imprimir]')) {
     botao.addEventListener('click', () => janela.print());
@@ -52,5 +53,8 @@ export function iniciar(doc, janela) {
   }
   for (const dialogo of doc.querySelectorAll('[data-modal]')) {
     ligarModal(janela, dialogo);
+  }
+  for (const menu of doc.querySelectorAll('.menu')) {
+    manterMenu(janela, menu);
   }
 }

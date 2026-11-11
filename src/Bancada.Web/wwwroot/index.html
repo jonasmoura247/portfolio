@@ -3,14 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Jonas Cavalcante — Dev .NET</title>
+<title>Jonas Moura — Dev .NET</title>
+<script src="/js/tema-cedo.js"></script>
+<link rel="stylesheet" href="/css/base.css">
 <link rel="stylesheet" href="/portfolio/portfolio.css">
 </head>
 <body>
 <header class="topo">
   <div class="gut barra">
-    <div class="marca"><span class="monograma" aria-hidden="true">JC</span><span>Jonas Cavalcante<small>~/dev-net</small></span></div>
-    <button class="btn" id="tema" type="button" aria-label="Alternar tema claro e escuro">Tema</button>
+    <div class="marca"><span class="monograma" aria-hidden="true">JM</span><span>Jonas Moura<small>~/dev-net</small></span></div>
+    <div class="atalhos">
+      <a class="btn primario" href="/bancada">Bancada →</a>
+      <button class="btn" id="tema" type="button" aria-label="Alternar tema claro e escuro">Tema</button>
+    </div>
   </div>
   <div class="gut">
     <div class="abas" role="tablist" aria-label="Seções do portfólio">
@@ -76,6 +81,8 @@
       <h3>Projetos próprios</h3>
       <ul>
         <li><b>Konta</b> (Flutter, Android): app de controle financeiro offline, publicado na Google Play. Sem cadastro, dados só no aparelho.</li>
+        <li><b>Lista de Presentes de Casamento</b> (Next.js, TypeScript): produto multi-tenant com link próprio por casal, Pix com QR Code, painel administrativo e conformidade com a LGPD; 197 testes automatizados.</li>
+        <li><b>Tower Defense</b> (Unity, C#): jogo feito em dupla, com raças, heróis, talentos, relíquias, ondas, slots de save e mais de 300 testes automatizados.</li>
         <li><b>Fluxo de trabalho com IA:</b> skills próprias no Claude Code e servidores MCP para reproduzir bugs, testar antes e depois e documentar correções; vaults de documentação em Markdown pensados para agentes.</li>
       </ul>
     </div>
@@ -187,6 +194,33 @@
     </div>
 
     <div class="item">
+      <h3>Lista de Presentes de Casamento</h3>
+      <p class="meta">Next.js · TypeScript · SQLite · código aberto</p>
+      <ul>
+        <li>Produto <b>multi-tenant</b>: cada casal se cadastra e recebe um link próprio com a lista de presentes, que vira tela de agradecimento um dia após o casamento.</li>
+        <li>Pagamento por <b>Pix</b> com QR Code gerado no próprio servidor; os noivos confirmam o recebimento no painel administrativo.</li>
+        <li>Segurança tratada como requisito: sessão com hash scrypt, validação do casal em toda alteração (contra IDOR) e CSP com nonce por requisição.</li>
+        <li><b>LGPD:</b> página de privacidade, exportação e exclusão da conta, e registro das operações de tratamento de dados.</li>
+        <li>Código em camadas (modelos, controllers, páginas) com <b>197 testes automatizados</b> em Vitest.</li>
+      </ul>
+      <div class="chips"><span class="chip v">TypeScript</span><span class="chip a">Next.js</span><span class="chip t">SQLite</span><span class="chip">Tailwind CSS</span><span class="chip">Vitest</span><span class="chip">LGPD</span></div>
+      <div class="tools"><a class="btn primario" href="https://github.com/jonasmoura247/casamento">Ver no GitHub</a></div>
+    </div>
+
+    <div class="item">
+      <h3>Tower Defense — jogo em Unity</h3>
+      <p class="meta">Unity · C# · feito em dupla · código aberto</p>
+      <ul>
+        <li>Jogo de defesa de torres com <b>raças</b> (anões, elfos, goblins e humanos), heróis, talentos, relíquias, bestiário, loot e ondas de inimigos.</li>
+        <li>Progressão e <b>slots de save</b> por jogador, com estatísticas por raça no lobby e eventos da partida gerados por aleatoriedade determinística (seed fixa).</li>
+        <li>Cerca de 17 mil linhas de C# no jogo e mais de 5 mil em <b>mais de 300 testes</b> automatizados em modo de edição (NUnit).</li>
+        <li>Desenvolvido em dupla, com Git, pull requests e divisão de tarefas documentada.</li>
+      </ul>
+      <div class="chips"><span class="chip a">C#</span><span class="chip v">Unity</span><span class="chip">NUnit</span><span class="chip">Git e pull requests</span></div>
+      <div class="tools"><a class="btn primario" href="https://github.com/jonasmoura247/td">Ver no GitHub</a></div>
+    </div>
+
+    <div class="item">
       <h3>rpg-mesa — painel de mesa de RPG</h3>
       <p class="meta">.NET 8 · código aberto</p>
       <ul>
@@ -229,7 +263,7 @@
     </div>
     <div class="item">
       <h3>Front-end e mobile</h3>
-      <div class="chips"><span class="chip v">JavaScript</span><span class="chip">HTML</span><span class="chip">CSS</span><span class="chip">Flutter</span></div>
+      <div class="chips"><span class="chip v">JavaScript</span><span class="chip v">TypeScript</span><span class="chip">Next.js</span><span class="chip">HTML</span><span class="chip">CSS</span><span class="chip">Flutter</span></div>
     </div>
     <div class="item">
       <h3>Práticas</h3>

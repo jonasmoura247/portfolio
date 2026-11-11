@@ -12,6 +12,12 @@ export function alternarTema(raiz, sistemaPrefereEscuro, janela) {
   return raiz.dataset.theme;
 }
 
+/* Com View Transitions, a tela antiga esmaece na nova; navegador sem suporte troca direto. */
+export function comTransicao(doc, acao) {
+  if (doc.startViewTransition) doc.startViewTransition(acao);
+  else acao();
+}
+
 export function restaurarTema(raiz, janela) {
   try {
     const salvo = janela.localStorage.getItem(CHAVE);

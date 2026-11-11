@@ -30,6 +30,14 @@ test('botão de tema alterna o tema usando a preferência do sistema', () => {
   assert.equal(doc.documentElement.dataset.theme, 'light');
 });
 
+test('o menu lateral é ligado: a faixa desliza até a tela atual', () => {
+  const rolagens = [];
+  const menu = { scrollLeft: 0, clientWidth: 300, querySelector: () => ({ offsetLeft: 500, offsetWidth: 100 }), scrollTo: o => rolagens.push(o) };
+  const doc = { documentElement: { dataset: {} }, querySelectorAll: s => (s === '.menu' ? [menu] : []) };
+  iniciar(doc, { matchMedia: () => ({ matches: false }), sessionStorage: { getItem: () => null }, addEventListener() {}, localStorage: { getItem: () => null } });
+  assert.deepEqual(rolagens, [{ left: 400, behavior: 'smooth' }]);
+});
+
 test('página sem os atributos não quebra', () => {
   assert.doesNotThrow(() => iniciar(docCom(), { matchMedia: () => ({ matches: false }) }));
 });

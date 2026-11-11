@@ -115,7 +115,7 @@ public partial class TextosETemaTestes
     [Test]
     public void Tema_TextoEAcentosPassamNoContrasteAA_NosDoisTemas()
     {
-        var css = File.ReadAllText(Path.Combine(Repositorio.Raiz, "src", "Bancada.Web", "wwwroot", "css", "estilo.css"));
+        var css = File.ReadAllText(Path.Combine(Repositorio.Raiz, "src", "Bancada.Web", "wwwroot", "css", "base.css")); // tokens compartilhados pelo Currículo e pela Bancada
         var claro = Tokens(Bloco(css, @":root \{"));
         var escuro = Tokens(Bloco(css, @":root\[data-theme=""dark""\] \{"));
         var texto = new[] { "--texto", "--texto-2", "--acento-texto", "--acento-2", "--acento-3", "--ok", "--atencao", "--perigo" };
@@ -129,6 +129,12 @@ public partial class TextosETemaTestes
                 {
                     Assert.That(Contraste(tema[t], tema[f]), Is.GreaterThanOrEqualTo(4.5), $"{nome}: {t} sobre {f}");
                 }
+            }
+
+            foreach (var f in fundos)
+            {
+                // bordas, contornos de foco e traços verdes: 3:1 é o mínimo para elemento que não é texto
+                Assert.That(Contraste(tema["--acento-borda"], tema[f]), Is.GreaterThanOrEqualTo(3), $"{nome}: --acento-borda sobre {f}");
             }
 
             Assert.That(Contraste(tema["--sobre-acento"], tema["--acento"]), Is.GreaterThanOrEqualTo(4.5), $"{nome}: botão primário");

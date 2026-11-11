@@ -10,13 +10,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>@T["app.nome"]</title>
+  <script src="~/js/tema-cedo.js" asp-append-version="true"></script>
+  <link rel="stylesheet" href="~/css/base.css" asp-append-version="true">
   <link rel="stylesheet" href="~/css/estilo.css" asp-append-version="true">
 </head>
 <body>
   <a class="pular" href="#conteudo">@T["nav.pular"]</a>
   <header class="topo">
     <div class="gut barra">
-      <span class="logo"><i aria-hidden="true"></i>@T["app.nome"].ToUpperInvariant()</span>
+      <a class="marca" href="/" title="@T["topo.portfolio"]"><span class="monograma" aria-hidden="true">@T["topo.sigla"]</span><span>@T["topo.marca"]<small>@("~/" + T["app.nome"].ToLowerInvariant())</small></span></a>
       <div class="ctl">
         <form method="post" asp-controller="Sessao" asp-action="Papel">
           <label>@T["topo.papel"]
@@ -50,7 +52,7 @@
         </form>
         <span class="sessao" title="@T["topo.sessao"]">@T["topo.sessao"] @sessao.Id[..8]…</span>
         <button class="btn ajuda" type="button" data-abrir-ajuda aria-haspopup="dialog">@T["ajuda.botao"]</button>
-        <a class="btn" href="/">@T["topo.portfolio"]</a>
+        <a class="btn so-largo" href="/">@T["topo.portfolio"]</a>
         <button class="btn" type="button" data-alternar-tema>@T["topo.tema"]</button>
         <form method="post" asp-controller="Sessao" asp-action="Reiniciar">
           <button class="btn" type="submit">@T["topo.reiniciar"]</button>

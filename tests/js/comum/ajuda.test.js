@@ -8,8 +8,8 @@ function alvo(extra = {}) {
   return { ouvintes, addEventListener(tipo, fn) { ouvintes[tipo] = fn; }, ...extra };
 }
 
-function montar({ comVideo = true, play = () => Promise.resolve() } = {}) {
-  const video = { tocou: 0, pausou: 0, play() { this.tocou++; return play(); }, pause() { this.pausou++; } };
+function montar({ comVideo = true } = {}) {
+  const video = { preload: 'none', tocou: 0, pausou: 0, play() { this.tocou++; }, pause() { this.pausou++; } };
   const fechar = alvo();
   const dialogo = alvo({ abriu: 0, fechou: 0, querySelector: () => (comVideo ? video : null), querySelectorAll: () => [fechar], showModal() { this.abriu++; }, close() { this.fechou++; } });
   const botao = alvo();
@@ -17,18 +17,12 @@ function montar({ comVideo = true, play = () => Promise.resolve() } = {}) {
   return { botao, dialogo, video, fechar };
 }
 
-test('o botão abre o modal e toca o vídeo', () => {
+test('o botão abre o modal com o vídeo parado, carregando só a primeira imagem', () => {
   const { botao, dialogo, video } = montar();
   botao.ouvintes.click();
   assert.equal(dialogo.abriu, 1);
-  assert.equal(video.tocou, 1);
-});
-
-test('autoplay barrado não quebra a abertura', async () => {
-  const { botao, dialogo } = montar({ play: () => Promise.reject(new Error('barrado')) });
-  botao.ouvintes.click();
-  await new Promise(resolve => setImmediate(resolve));
-  assert.equal(dialogo.abriu, 1);
+  assert.equal(video.tocou, 0, 'o visitante é quem dá o play');
+  assert.equal(video.preload, 'metadata');
 });
 
 test('ao fechar o vídeo pausa; fundo e botão X fecham', () => {

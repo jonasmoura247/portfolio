@@ -4,6 +4,7 @@ function show(id) {
     const sel = t.id === id;
     t.setAttribute('aria-selected', sel);
     document.getElementById(t.getAttribute('aria-controls')).hidden = !sel;
+    if (sel) t.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); // no celular, a aba escolhida desliza para o meio da faixa
   });
   const tok = id.slice(2);
   if (location.hash.slice(1) !== tok) history.replaceState(null, '', '#' + tok);
@@ -145,11 +146,13 @@ const rotuloTema = () => { botTema.textContent = escuro() ? 'Tema escuro' : 'Tem
 // mesma chave do Bancada: o tema escolhido aqui vale lá e vice-versa
 try { raiz.dataset.theme = localStorage.getItem('bancada.tema') || raiz.dataset.theme || ''; } catch { /* sem armazenamento: segue o sistema */ }
 if (!raiz.dataset.theme) delete raiz.dataset.theme;
-botTema.addEventListener('click', () => {
+const trocarTema = () => {
   raiz.dataset.theme = escuro() ? 'light' : 'dark';
   try { localStorage.setItem('bancada.tema', raiz.dataset.theme); } catch { /* idem */ }
   rotuloTema();
-});
+};
+// com View Transitions o tema antigo esmaece no novo; navegador sem suporte troca direto
+botTema.addEventListener('click', () => { if (document.startViewTransition) document.startViewTransition(trocarTema); else trocarTema(); });
 rotuloTema();
 
 document.getElementById('copy').addEventListener('click', async () => {

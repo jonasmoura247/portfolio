@@ -457,10 +457,12 @@
   "soroteca.vencendo": ["vence em 1 dia","expires within 1 day"],
   "soroteca.vencida": ["vencida","expired"],
   "topo.idioma": ["Idioma","Language"],
+  "topo.marca": ["Jonas Moura","Jonas Moura"],
   "topo.operador": ["Operador","Operator"],
   "topo.papel": ["Papel","Role"],
   "topo.portfolio": ["Portfólio","Portfolio"],
   "topo.reiniciar": ["Reiniciar sessão","Reset session"],
   "topo.sessao": ["sessão","session"],
+  "topo.sigla": ["JM","JM"],
   "topo.tema": ["Tema","Theme"]
 }

@@ -8,11 +8,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@Model</title>
+  <link rel="stylesheet" href="~/css/base.css" asp-append-version="true">
   <link rel="stylesheet" href="~/css/estilo.css" asp-append-version="true">
 </head>
 <body>
   <main class="tela erro-pagina" id="conteudo">
-    <p class="dev">// @Model</p>
+    <p class="dev">@Model</p>
     <h1>@CatalogoDeTextos.Obter("erro." + Model, "pt")</h1>
     <p class="sub">@CatalogoDeTextos.Obter("erro." + Model, "en")</p>
     <p><a class="btn primario" href="/bancada">@CatalogoDeTextos.Obter("erro.voltar", "pt")</a></p>
