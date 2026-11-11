@@ -13,3 +13,7 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Decisão do Jonas (07/11/2026): o projeto fica no .NET 9, sem migrar para o 10. Só atualizações de patch e minor das imagens.
+    ignore:
+      - dependency-name: "dotnet/*"
+        update-types: ["version-update:semver-major"]
