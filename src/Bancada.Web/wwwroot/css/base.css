@@ -89,26 +89,21 @@ a.marca:hover small { color: var(--acento-texto); }
 @keyframes cresce { from { transform: scaleX(0); } }
 
 /* movimento: a mesma entrada nas trocas de aba do Currículo, entre as telas da Bancada e na passagem de uma área para a outra.
-   Na navegação entre páginas o cabeçalho fica no lugar e só o conteúdo troca (View Transitions; navegador sem suporte troca direto). */
+   Entre páginas não há View Transition: a camada dela engolia cliques dados nos primeiros ~500 ms (parecia precisar de dois cliques no menu). */
 @keyframes entra { from { opacity: 0; } }
 @keyframes sobe { from { opacity: 0; transform: translateY(18px); } }
-/* 1) entre páginas (e na troca de tema): a tela antiga esmaece na nova; o cabeçalho fica no lugar */
-@view-transition { navigation: auto; }
-.topo { view-transition-name: topo; }
-::view-transition-old(root) { animation-duration: .2s; }
-::view-transition-new(root) { animation-duration: .35s; }
-/* 2) ao abrir uma aba do Currículo ou uma tela da Bancada, os blocos sobem em cascata (vale em qualquer navegador).
+/* 1) ao abrir uma aba do Currículo ou uma tela da Bancada, os blocos sobem em cascata (vale em qualquer navegador).
    O trecho #vivo fica de fora: ele é trocado a cada 1,5 s e piscaria. */
-.pagina:not([hidden]) > *, .tela > :not(#vivo) { animation: sobe .5s cubic-bezier(.2, .7, .2, 1) backwards; }
-.pagina:not([hidden]) > :nth-child(2), .tela > :nth-child(2) { animation-delay: .06s; }
-.pagina:not([hidden]) > :nth-child(3), .tela > :nth-child(3) { animation-delay: .12s; }
-.pagina:not([hidden]) > :nth-child(4), .tela > :nth-child(4) { animation-delay: .18s; }
-.pagina:not([hidden]) > :nth-child(n+5), .tela > :nth-child(n+5) { animation-delay: .24s; }
-/* 3) janelas e avisos entram do mesmo jeito */
-dialog[open] { animation: sobe .28s cubic-bezier(.2, .7, .2, 1); }
-dialog[open]::backdrop { animation: entra .28s ease-out; }
-.aviso { animation: sobe .3s cubic-bezier(.2, .7, .2, 1); }
-/* 4) resposta ao toque e ao mouse */
+.pagina:not([hidden]) > *, .tela > :not(#vivo) { animation: sobe .8s cubic-bezier(.2, .7, .2, 1) backwards; }
+.pagina:not([hidden]) > :nth-child(2), .tela > :nth-child(2) { animation-delay: .1s; }
+.pagina:not([hidden]) > :nth-child(3), .tela > :nth-child(3) { animation-delay: .2s; }
+.pagina:not([hidden]) > :nth-child(4), .tela > :nth-child(4) { animation-delay: .3s; }
+.pagina:not([hidden]) > :nth-child(n+5), .tela > :nth-child(n+5) { animation-delay: .4s; }
+/* 2) janelas e avisos entram do mesmo jeito */
+dialog[open] { animation: sobe .4s cubic-bezier(.2, .7, .2, 1); }
+dialog[open]::backdrop { animation: entra .4s ease-out; }
+.aviso { animation: sobe .45s cubic-bezier(.2, .7, .2, 1); }
+/* 3) resposta ao toque e ao mouse */
 a { transition: color .15s; }
 .btn { transition: border-color .15s, background .15s, color .15s, transform .1s; }
 .btn:active:not([disabled]) { transform: scale(.97); }
