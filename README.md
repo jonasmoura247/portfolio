@@ -2,6 +2,8 @@
 
 Desenvolvedor .NET (C#, ASP.NET MVC, SQL Server, Oracle). Este repositório reúne o meu currículo/portfólio e um projeto de demonstração que construí para mostrar como trabalho: o **Bancada**, um mini sistema de laboratório clínico (LIS) fictício, mas funcional.
 
+**No ar:** https://jonasmoura.com.br
+
 - **`/`**: o portfólio (currículo, perfil, experiência, projetos, stack e contato). Página estática, sem login.
 - **`/bancada`**: o sistema de laboratório. Quem entra já começa como **Admin**, vê todos os módulos e pode trocar de papel (Recepção, Médico, Coleta, Analista) pelo seletor verde no topo para ver o menu e as permissões mudarem.
 
