@@ -24,14 +24,14 @@
           <span class="ei">@linha.Key</span>
           foreach (var c in linha)
           {
-            <a class="@Classe(c)" href="/soroteca?caixa=@Model.Caixa&posicao=@c.Posicao.Id" aria-pressed="@(s?.Posicao.Id == c.Posicao.Id ? "true" : "false")" title="@c.Posicao.Nome @c.Amostra?.Etiqueta" aria-label="@c.Posicao.Nome @c.Amostra?.Etiqueta">@c.Posicao.Coluna</a>
+            <a class="@Classe(c)" href="/soroteca?caixa=@Model.Caixa&posicao=@c.Posicao.Id#posicao" aria-pressed="@(s?.Posicao.Id == c.Posicao.Id ? "true" : "false")" title="@c.Posicao.Nome @c.Amostra?.Etiqueta" aria-label="@c.Posicao.Nome @c.Amostra?.Etiqueta">@c.Posicao.Coluna</a>
           }
         }
       </div>
       <div class="legenda"><span><i class="oc"></i>@T["soroteca.ocupada"]</span><span><i class="vd"></i>@T["soroteca.vencendo"]</span><span><i class="vc"></i>@T["soroteca.vencida"]</span></div>
     </div>
   </section>
-  <section class="painel">
+  <section class="painel" id="posicao">
     <div class="cab"><h3>@T["soroteca.posicao"]</h3></div>
     <div class="corpo pilha">
       @if (s is null)

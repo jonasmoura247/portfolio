@@ -153,7 +153,7 @@ public class TelasTestes
     {
         await _n.Assumir("Analista", "ANA-01");
         var (_, mapa) = await _n.Ver("/soroteca?caixa=R1-C1");
-        var ocupada = Navegador.Numeros(mapa, @"class=""pos oc"" href=""/soroteca\?caixa=R1-C1&(?:amp;)?posicao=(\d+)""")[0];
+        var ocupada = Navegador.Numeros(mapa, @"class=""pos oc"" href=""/soroteca\?caixa=R1-C1&(?:amp;)?posicao=(\d+)#posicao""")[0];
         var (_, detalhe) = await _n.Ver($"/soroteca?caixa=R1-C1&posicao={ocupada}");
         var amostra = Navegador.Numeros(detalhe, @"name=""amostra"" value=""(\d+)""")[0];
 
